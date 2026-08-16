@@ -1,6 +1,7 @@
 import 'server-only';
 import { neon } from '@neondatabase/serverless';
 import type { Order } from './types';
+import { normalizeOrder } from './normalize';
 
 let _sql: ReturnType<typeof neon> | null = null;
 function sql() {
@@ -16,16 +17,16 @@ export async function listOrders(limit = 300): Promise<Order[]> {
   const rows = (await sql().query(
     `select ${ORDER_COLS} from orders order by created_at desc limit $1`,
     [limit],
-  )) as Order[];
-  return rows;
+  )) as Record<string, unknown>[];
+  return rows.map(normalizeOrder);
 }
 
 export async function getOrder(id: string): Promise<Order | null> {
   const rows = (await sql().query(
     `select ${ORDER_COLS} from orders where id = $1`,
     [id],
-  )) as Order[];
-  return rows[0] ?? null;
+  )) as Record<string, unknown>[];
+  return rows[0] ? normalizeOrder(rows[0]) : null;
 }
 
 // Kolonnenavn interpoleres kun fra denne typed whitelisten – aldri brukerinput.

@@ -15,13 +15,18 @@ export interface MaterialList {
   items: MaterialItem[];
 }
 
-const SKJUL_STANDARD: MaterialList = {
-  source: 'Roverk Skjul – plukkliste 4-dunk Standard B3100×D850×H1710 (2026-07-21), omregnet per skur',
-  perUnit: true,
-  items: [
-    { navn: 'Spilekledning', dimensjon: '28×45 Royal', antall: '131 lm', merknad: 'sider + bakvegg + frontterskel, c/c 65, inkl. ~10 % svinn' },
-    { navn: 'Frontstolpe (hjørne, synlig)', dimensjon: '48×98 Royal C24 · 1466 mm', antall: '2 stk' },
-    { navn: 'Frontdrager (synlig)', dimensjon: '48×148 Royal C24 · 3100 mm', antall: '1 stk', merknad: 'bekreft at 48×148 fås i Royal; ellers impreg C24 + beis' },
+// Plukklista gjelder 4-dunk Standard (B3100×D850×H1710). De tre synlige
+// delene følger valgt kledning: Royal eller vanlig trykkimpregnert.
+function skjulStandard4(kledning: 'royal' | 'ubeh'): MaterialList {
+  const royal = kledning === 'royal';
+  const kledningNavn = royal ? 'Royal' : 'impregnert';
+  return {
+    source: `Roverk Skjul – plukkliste 4-dunk Standard B3100×D850×H1710 (2026-07-21), per skur, kledning ${kledningNavn}`,
+    perUnit: true,
+    items: [
+      { navn: 'Spilekledning', dimensjon: royal ? '28×45 Royal' : '28×45 impr. furu', antall: '131 lm', merknad: 'sider + bakvegg + frontterskel, c/c 65, inkl. ~10 % svinn' },
+      { navn: 'Frontstolpe (hjørne, synlig)', dimensjon: royal ? '48×98 Royal C24 · 1466 mm' : '48×98 impr. C24 · 1466 mm', antall: '2 stk' },
+      { navn: 'Frontdrager (synlig)', dimensjon: royal ? '48×148 Royal C24 · 3100 mm' : '48×148 impr. C24 · 3100 mm', antall: '1 stk', merknad: royal ? 'bekreft at 48×148 fås i Royal; ellers impreg C24 + beis' : undefined },
     { navn: 'Midtstolpe side', dimensjon: '48×48 impr. C24 · 1309 mm', antall: '2 stk' },
     { navn: 'Bakstolpe (hjørne + mellom)', dimensjon: '48×48 impr. C24 · 1301 mm', antall: '5 stk' },
     { navn: 'Sidesvill + midtrekke side', dimensjon: '48×48 impr. C24 · 850 mm', antall: '4 stk' },
@@ -35,9 +40,10 @@ const SKJUL_STANDARD: MaterialList = {
     { navn: 'Vinkelbeslag', dimensjon: '90°, galvanisert', antall: '~24 stk' },
     { navn: 'Konstruksjonsskrue', dimensjon: '5×90 varmforsinket', antall: '~50 stk', merknad: 'skjøter c/c ~200 mm' },
     { navn: 'Spileskruer kledning', dimensjon: '~4,5×55 rustfri A2/A4', antall: '1,5 esker', merknad: 'kledning → ramme' },
-    { navn: 'Justerbar fot', dimensjon: '—', antall: '6 stk', merknad: 'oppretting ved montering' },
-  ],
-};
+      { navn: 'Justerbar fot', dimensjon: '—', antall: '6 stk', merknad: 'oppretting ved montering' },
+    ],
+  };
+}
 
 const VED_MEDIUM: MaterialList = {
   source: 'Roverk Ved – plukkliste Medium 2-etasjes A-ramme Royal (2026-07-21), kappeliste per enhet',
@@ -88,10 +94,12 @@ function configContains(config: Record<string, unknown>, needle: string): boolea
 export function materialsFor(site: string, config: Record<string, unknown>): MaterialList | null {
   const key = site === 'orden-v2' ? 'orden' : site;
   if (key === 'skjul') {
-    // Plukklista gjelder Standard-serien (B3100×D850×H1710). XL har andre mål
-    // -> ingen liste er bedre enn feil liste.
-    if (configContains(config, 'standard')) return SKJUL_STANDARD;
-    return null;
+    // Plukklista gjelder 4-dunk Standard (B3100×D850×H1710). Andre antall
+    // dunker/serier har andre mål -> ingen liste er bedre enn feil liste.
+    const serie = String(config.serie ?? '').toLowerCase();
+    const count = Number(config.count);
+    if (serie !== 'standard' || count !== 4) return null;
+    return skjulStandard4(config.kledning === 'royal' ? 'royal' : 'ubeh');
   }
   if (key === 'ved') {
     if (configContains(config, 'stor')) return VED_STOR;

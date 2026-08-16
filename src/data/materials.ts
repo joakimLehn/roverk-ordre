@@ -87,7 +87,12 @@ function configContains(config: Record<string, unknown>, needle: string): boolea
 
 export function materialsFor(site: string, config: Record<string, unknown>): MaterialList | null {
   const key = site === 'orden-v2' ? 'orden' : site;
-  if (key === 'skjul') return SKJUL_STANDARD;
+  if (key === 'skjul') {
+    // Plukklista gjelder Standard-serien (B3100×D850×H1710). XL har andre mål
+    // -> ingen liste er bedre enn feil liste.
+    if (configContains(config, 'standard')) return SKJUL_STANDARD;
+    return null;
+  }
   if (key === 'ved') {
     if (configContains(config, 'stor')) return VED_STOR;
     if (configContains(config, 'medium')) return VED_MEDIUM;

@@ -3,6 +3,7 @@ import { normalizeEmail } from './email';
 export interface ManualOrderInput {
   site: string;
   product: string | null;
+  config: Record<string, unknown>; // samme skjema som nettsidens konfiguratorer
   kanal: string;
   name: string;
   phone: string | null;
@@ -22,6 +23,49 @@ export type ParseResult =
   | { ok: true; data: ManualOrderInput }
   | { ok: false; error: string };
 
+function intInRange(raw: string, min: number, max: number): number | null {
+  const n = Number(raw);
+  return Number.isInteger(n) && n >= min && n <= max ? n : null;
+}
+
+/** Bygger config (nettsidens skjema) + generert produkttekst per produkt. */
+function buildProduct(site: string, f: Record<string, string>):
+  | { config: Record<string, unknown>; productText: string }
+  | { error: string } {
+  if (site === 'skjul') {
+    const count = intInRange(f.skjul_count ?? '', 1, 8);
+    if (count == null) return { error: 'Antall dunker må være 1–8.' };
+    const serie = f.skjul_serie === 'XL' ? 'XL' : 'Standard';
+    const kledning = f.skjul_kledning === 'royal' ? 'royal' : 'ubeh';
+    return {
+      config: {
+        count,
+        serie,
+        kledning,
+        montering: f.skjul_montering === 'on',
+        forankring: f.skjul_forankring === 'on',
+      },
+      productText: `${count}-dunk ${serie}`,
+    };
+  }
+  if (site === 'ved') {
+    const modell = f.ved_modell === 'Stor' ? 'Stor' : 'Medium';
+    return {
+      config: { navn: modell, size: modell.toLowerCase() },
+      productText: `Vedskjul ${modell}`,
+    };
+  }
+  // orden
+  const bt = f.orden_bt === '100L' ? '100L' : '60L';
+  const w = intInRange(f.orden_w ?? '', 1, 5);
+  const h = intInRange(f.orden_h ?? '', 3, 7);
+  if (w == null || h == null) return { error: 'Orden: bredde må være 1–5 og høyde 3–7 kasser.' };
+  return {
+    config: { bt, w, h, withWheels: f.orden_hjul === 'on' },
+    productText: `Orden ${bt} · ${w}×${h}`,
+  };
+}
+
 export function parseManualOrder(f: Record<string, string>): ParseResult {
   const site = (f.site ?? '').trim();
   if (!(MANUAL_SITES as readonly string[]).includes(site)) {
@@ -30,6 +74,9 @@ export function parseManualOrder(f: Record<string, string>): ParseResult {
 
   const name = (f.name ?? '').trim();
   if (!name) return { ok: false, error: 'Kundenavn er påkrevd.' };
+
+  const built = buildProduct(site, f);
+  if ('error' in built) return { ok: false, error: built.error };
 
   const emailRaw = (f.email ?? '').trim();
   const email = emailRaw ? normalizeEmail(emailRaw) : null;
@@ -50,7 +97,8 @@ export function parseManualOrder(f: Record<string, string>): ParseResult {
     ok: true,
     data: {
       site,
-      product: (f.product ?? '').trim() || null,
+      product: (f.product ?? '').trim() || built.productText,
+      config: built.config,
       kanal: (KANALER as readonly string[]).includes(kanal) ? kanal : 'Annet',
       name,
       phone: (f.phone ?? '').trim() || null,

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Order } from '@/lib/types';
 import { TestBadge } from './Badge';
 import { StatusSelect, InlineEconomy } from './InlineControls';
-import { formatDateNo, formatPrice, siteLabel } from '@/lib/format';
+import { formatDateNo, formatPrice, materialLabel, siteLabel } from '@/lib/format';
 
 const td = 'border-b border-line px-3 py-2.5';
 
@@ -33,6 +33,9 @@ export function OrderTable({ orders }: { orders: Order[] }) {
               <td className={`${td} font-semibold`}>
                 <Link href={`/ordre/${o.id}`} className="block">
                   {siteLabel(o.site)}{o.product ? ` – ${o.product}` : ''}
+                  {materialLabel(o.config) ? (
+                    <span className="block text-xs font-normal text-muted">{materialLabel(o.config)}</span>
+                  ) : null}
                 </Link>
               </td>
               <td className={td}>

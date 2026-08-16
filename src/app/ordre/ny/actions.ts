@@ -14,18 +14,17 @@ export async function createOrder(_prev: NewOrderState, formData: FormData): Pro
   const { email: registeredBy } = await requireUser();
 
   const fields: Record<string, string> = {};
-  for (const key of ['site', 'product', 'kanal', 'name', 'phone', 'email', 'address', 'price_nok', 'preferred_date', 'notes']) {
-    fields[key] = String(formData.get(key) ?? '');
+  for (const [key, value] of formData.entries()) {
+    if (typeof value === 'string') fields[key] = value;
   }
 
   const parsed = parseManualOrder(fields);
   if (!parsed.ok) return { message: parsed.error };
 
-  const { kanal, internal_notes, ...rest } = parsed.data;
+  const { kanal, config, ...rest } = parsed.data;
   const id = await insertManualOrder({
     ...rest,
-    internal_notes,
-    config: { kanal, registrert_av: registeredBy, manuell: true },
+    config: { ...config, kanal, registrert_av: registeredBy, manuell: true },
   });
 
   revalidatePath('/');

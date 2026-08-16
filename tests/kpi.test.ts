@@ -32,10 +32,19 @@ describe('computeKpis', () => {
     ]);
     expect(k.utestaaendeNok).toBe(86400);
   });
+  it('summerer totalt ordrebeløp for alle reelle ordrer', () => {
+    const k = computeKpis([
+      o({ price_nok: 64900 }),
+      o({ price_nok: 18400, paid_at: '2026-08-12T00:00:00Z' }),
+      o({ price_nok: null }),
+      o({ price_nok: 99999, is_test: true }),
+    ]);
+    expect(k.totalNok).toBe(83300);
+  });
   it('ignorerer testordrer fullstendig', () => {
     const k = computeKpis([
       o({ is_test: true, build_status: 'ny', invoiced_at: '2026-08-10T00:00:00Z', price_nok: 1000 }),
     ]);
-    expect(k).toEqual({ nye: 0, underBygging: 0, montertIkkeFakturert: 0, utestaaendeNok: 0 });
+    expect(k).toEqual({ nye: 0, underBygging: 0, montertIkkeFakturert: 0, utestaaendeNok: 0, totalNok: 0 });
   });
 });

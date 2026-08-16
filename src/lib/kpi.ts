@@ -5,6 +5,7 @@ export interface Kpis {
   underBygging: number;
   montertIkkeFakturert: number;
   utestaaendeNok: number;
+  totalNok: number;
 }
 
 export function computeKpis(orders: Order[]): Kpis {
@@ -16,5 +17,6 @@ export function computeKpis(orders: Order[]): Kpis {
     utestaaendeNok: reelle
       .filter((o) => o.invoiced_at && !o.paid_at)
       .reduce((sum, o) => sum + (o.price_nok ?? 0), 0),
+    totalNok: reelle.reduce((sum, o) => sum + (o.price_nok ?? 0), 0),
   };
 }

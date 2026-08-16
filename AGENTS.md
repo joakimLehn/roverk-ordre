@@ -52,6 +52,19 @@ separat til Vercel). Denne appen:
   (`invoiced_at`/`paid_at`, tidsstempler). `is_test` skjuler ordren fra
   lister og KPI-er.
 
+## Mobil først
+
+Snekkerne bruker appen stående, med én hånd, ofte med hansker. Derfor:
+
+- Under `sm` (768 px) rendres ordrelista som kort (`OrderCard`), over som
+  tabell (`OrderTable`). Begge kaller de samme server-handlingene.
+- Trykkflater skal være minst 46 px høye. Nedtrekksmenyer unngås for
+  hyppige valg – bruk bunnark (`StatusSheet`) i stedet.
+- Visningene i `src/lib/views.ts` («Å bygge» / «Å fakturere») er mobilens
+  primære navigasjon; det fulle filterpanelet er sammenslått bak `<details>`.
+- Skjemafelt bruker `text-base` på mobil – mindre enn 16 px gjør at iOS
+  zoomer inn ved fokus.
+
 ## Regler for endringer
 
 - **TDD for domenelogikk**: alt i `src/lib/` (unntatt db/auth/supabase) og

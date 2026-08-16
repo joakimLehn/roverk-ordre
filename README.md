@@ -51,6 +51,14 @@ npm test           # vitest (domenelogikk)
 npm run build      # produksjonsbygg
 ```
 
+## Mobil
+
+Mobil er primærflaten for snekkerne, så lista rendres som kort under 768 px
+(tabell på skrivebord). Status endres via bunnark med fire store valg,
+fakturert/betalt er avhukinger på kortet, og fanene «Å bygge» / «Å fakturere»
+erstatter filterpanelet for de vanlige tilfellene. Detaljsiden har Ring- og
+Veibeskrivelse-knapper. Alle trykkflater er minst 46 px.
+
 ## Manuelle ordrer
 
 Bestillinger som kommer via e-post, Instagram eller telefon legges inn med

@@ -5,6 +5,7 @@ import { getOrder } from '@/lib/db';
 import { materialsFor } from '@/data/materials';
 import { configEntries, formatDateNo, formatPrice, siteLabel } from '@/lib/format';
 import { Header } from '@/components/Header';
+import { ContactActions } from '@/components/ContactActions';
 import { StatusButtons } from '@/components/StatusButtons';
 import { EconomyChecks, TestFlag } from '@/components/EconomyChecks';
 import { NotesForm, PlannedDate } from '@/components/NotesForm';
@@ -29,19 +30,22 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
 
   const materials = materialsFor(order.site, order.config);
   const cfg = configEntries(order.config);
-  const tdc = 'border-b border-line px-2.5 py-1.5';
 
   return (
     <>
       <Header email={email} />
-      <main className="mx-auto max-w-3xl px-6 py-5">
-        <Link href="/" className="text-[13px] text-muted">← Alle ordrer</Link>
-        <h1 className="mt-2 text-xl font-bold">
-          {siteLabel(order.site)}{order.product ? ` – ${order.product}` : ''} · {order.name}
+      <main className="mx-auto max-w-3xl px-4 py-4 sm:px-6 sm:py-5">
+        <Link href="/" className="flex min-h-[36px] items-center text-[13px] text-muted">
+          ← Alle ordrer
+        </Link>
+        <h1 className="mt-1 text-[19px] font-extrabold leading-tight sm:text-xl">
+          {siteLabel(order.site)}{order.product ? ` – ${order.product}` : ''}
         </h1>
-        <p className="mb-5 text-[13px] text-muted">
-          Mottatt {formatDateNo(order.created_at)} · {formatPrice(order.price_nok)} · #{order.id.slice(0, 8)}
+        <p className="mb-4 text-[13px] text-muted">
+          {order.name} · {formatPrice(order.price_nok)} · mottatt {formatDateNo(order.created_at)}
         </p>
+
+        <ContactActions order={order} />
 
         <Section title="Byggstatus">
           <StatusButtons orderId={order.id} current={order.build_status} />
@@ -59,49 +63,44 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           <CustomerForm order={order} />
         </Section>
 
-        {cfg.length > 0 && (
+        {cfg.length > 0 ? (
           <Section title="Bestilling">
-            <div className="grid grid-cols-[160px_1fr] gap-y-1 text-[13.5px]">
+            <div className="overflow-hidden rounded-xl border border-line bg-white">
               {cfg.map((r) => (
-                <div key={r.key} className="contents">
+                <div
+                  key={r.key}
+                  className="flex justify-between gap-4 border-b border-line px-3.5 py-2.5 text-sm last:border-b-0"
+                >
                   <span className="text-muted">{r.key}</span>
-                  <span>{r.value}</span>
+                  <span className="text-right font-semibold">{r.value}</span>
                 </div>
               ))}
             </div>
           </Section>
-        )}
+        ) : null}
 
-        <Section title="Materialbehov">
+        <Section title={materials?.perUnit ? 'Materialbehov · per enhet' : 'Materialbehov'}>
           {materials ? (
-            <div className="overflow-x-auto rounded-xl border border-line bg-white">
-              <table className="w-full text-[13px]">
-                <thead>
-                  <tr className="text-left text-muted">
-                    <th className={`${tdc} font-semibold`}>Materiale</th>
-                    <th className={`${tdc} font-semibold`}>Dimensjon</th>
-                    <th className={`${tdc} font-semibold`}>Antall</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {materials.items.map((m) => (
-                    <tr key={m.navn}>
-                      <td className={tdc}>
-                        {m.navn}
-                        {m.merknad ? <span className="block text-xs text-muted">{m.merknad}</span> : null}
-                      </td>
-                      <td className={tdc}>{m.dimensjon}</td>
-                      <td className={`${tdc} whitespace-nowrap`}>{m.antall}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className="px-2.5 py-1.5 text-xs text-muted">
-                {materials.perUnit ? 'Per enhet · ' : ''}Kilde: {materials.source}
-              </p>
+            <div className="overflow-hidden rounded-xl border border-line bg-white">
+              {materials.items.map((m) => (
+                <div
+                  key={m.navn}
+                  className="flex items-start justify-between gap-3 border-b border-line px-3.5 py-2.5 last:border-b-0"
+                >
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold">{m.navn}</div>
+                    <div className="text-xs text-muted">{m.dimensjon}</div>
+                    {m.merknad ? <div className="mt-0.5 text-xs text-muted">{m.merknad}</div> : null}
+                  </div>
+                  <div className="whitespace-nowrap text-sm font-bold tabular-nums">{m.antall}</div>
+                </div>
+              ))}
+              <p className="bg-sand px-3.5 py-2 text-xs text-muted">Kilde: {materials.source}</p>
             </div>
           ) : (
-            <p className="text-sm text-muted">Materialliste mangler for denne varianten.</p>
+            <p className="rounded-xl border border-line bg-white p-3.5 text-sm text-muted">
+              Materialliste mangler for denne varianten.
+            </p>
           )}
         </Section>
 
@@ -109,7 +108,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           <NotesForm orderId={order.id} notes={order.internal_notes ?? ''} />
         </Section>
 
-        <div className="border-t border-dashed border-line pt-4">
+        <div className="border-t border-dashed border-line pt-3">
           <TestFlag orderId={order.id} isTest={order.is_test} />
         </div>
       </main>

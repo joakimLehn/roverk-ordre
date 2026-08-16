@@ -28,7 +28,7 @@ export function CustomerForm({ order }: { order: Order }) {
         <span className="text-muted">Ønsket dato</span><span>{order.preferred_date ?? '–'}</span>
         <button
           onClick={() => setEditing(true)}
-          className="col-span-2 mt-1 w-fit cursor-pointer text-[13px] font-semibold text-brand"
+          className="col-span-2 mt-1 flex min-h-[40px] w-fit cursor-pointer items-center text-[13.5px] font-semibold text-brand"
         >
           Rediger kundeinfo
         </button>
@@ -36,7 +36,7 @@ export function CustomerForm({ order }: { order: Order }) {
     );
   }
 
-  const input = 'w-full rounded-lg border border-line bg-white px-2.5 py-2 text-sm';
+  const input = 'min-h-[46px] w-full rounded-lg border border-line bg-white px-3 py-2 text-base sm:text-sm';
   return (
     <form
       action={(fd) => start(async () => { await saveCustomer(order.id, fd); setEditing(false); })}
@@ -53,14 +53,14 @@ export function CustomerForm({ order }: { order: Order }) {
       <div className="flex gap-2">
         <button
           disabled={pending}
-          className="cursor-pointer rounded-lg bg-brand px-3.5 py-2 text-[13px] font-semibold text-white disabled:opacity-60"
+          className="min-h-[46px] flex-1 cursor-pointer rounded-lg bg-brand px-3.5 text-[14.5px] font-bold text-white disabled:opacity-60 sm:min-h-0 sm:flex-none sm:py-2 sm:text-[13px] sm:font-semibold"
         >
           {pending ? 'Lagrer …' : 'Lagre'}
         </button>
         <button
           type="button"
           onClick={() => setEditing(false)}
-          className="cursor-pointer rounded-lg border border-line px-3.5 py-2 text-[13px]"
+          className="min-h-[46px] flex-1 cursor-pointer rounded-lg border border-line bg-white px-3.5 text-[14.5px] font-semibold sm:min-h-0 sm:flex-none sm:py-2 sm:text-[13px] sm:font-normal"
         >
           Avbryt
         </button>

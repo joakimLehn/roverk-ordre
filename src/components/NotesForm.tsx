@@ -12,12 +12,12 @@ export function NotesForm({ orderId, notes }: { orderId: string; notes: string }
         value={value}
         onChange={(e) => setValue(e.target.value)}
         rows={4}
-        className="w-full rounded-lg border border-line bg-white p-2.5 text-[13.5px]"
+        className="w-full rounded-xl border border-line bg-white p-3 text-base sm:rounded-lg sm:p-2.5 sm:text-[13.5px]"
       />
       <button
         disabled={pending}
         onClick={() => start(() => saveNotes(orderId, value))}
-        className="mt-1.5 cursor-pointer rounded-lg border border-line bg-white px-3.5 py-2 text-[13px] font-semibold disabled:opacity-60"
+        className="mt-2 min-h-[46px] w-full cursor-pointer rounded-xl border border-line bg-white px-3.5 text-[14.5px] font-bold disabled:opacity-60 sm:min-h-0 sm:w-auto sm:rounded-lg sm:py-2 sm:text-[13px] sm:font-semibold"
       >
         {pending ? 'Lagrer …' : 'Lagre notat'}
       </button>
@@ -33,7 +33,7 @@ export function PlannedDate({ orderId, date }: { orderId: string; date: string }
       defaultValue={date}
       disabled={pending}
       onChange={(e) => start(() => setPlannedDate(orderId, e.target.value))}
-      className="rounded-lg border border-line bg-white px-2.5 py-2 text-sm"
+      className="min-h-[50px] w-full rounded-xl border border-line bg-white px-3 text-base sm:min-h-0 sm:w-auto sm:rounded-lg sm:px-2.5 sm:py-2 sm:text-sm"
     />
   );
 }

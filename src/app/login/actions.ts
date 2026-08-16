@@ -27,14 +27,16 @@ export async function requestCode(_prev: LoginState, formData: FormData): Promis
       return { step: 'email', message: 'Kunne ikke sende kode. Prøv igjen om litt.' };
     }
   }
-  return { step: 'code', email, message: 'Hvis e-posten er registrert, har du fått en 6-sifret kode.' };
+  return { step: 'code', email, message: 'Hvis e-posten er registrert, har du fått en 8-sifret kode.' };
 }
 
 export async function verifyCode(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const email = normalizeEmail(String(formData.get('email') ?? ''));
   const token = String(formData.get('token') ?? '').trim();
-  if (!email || !/^\d{6}$/.test(token)) {
-    return { step: 'code', email: email ?? undefined, message: 'Skriv inn den 6-sifrede koden fra e-posten.' };
+  // Supabase-prosjektet er satt opp med 8-sifret OTP; godta 6–8 så en
+  // senere endring av lengden i Supabase ikke låser folk ute.
+  if (!email || !/^\d{6,8}$/.test(token)) {
+    return { step: 'code', email: email ?? undefined, message: 'Skriv inn den 8-sifrede koden fra e-posten.' };
   }
   const supabase = await supabaseServer();
   const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });

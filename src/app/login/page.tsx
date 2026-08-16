@@ -43,11 +43,11 @@ export default function LoginPage() {
               <input
                 name="token"
                 inputMode="numeric"
-                pattern="\d{6}"
-                maxLength={6}
+                pattern="\d{8}"
+                maxLength={8}
                 required
                 autoFocus
-                className="mt-1 w-full rounded-lg border border-line px-3 py-2.5 text-center text-2xl font-bold tracking-[0.4em] text-ink"
+                className="mt-1 w-full rounded-lg border border-line px-3 py-2.5 text-center text-2xl font-bold tracking-[0.3em] text-ink"
               />
             </label>
           </>

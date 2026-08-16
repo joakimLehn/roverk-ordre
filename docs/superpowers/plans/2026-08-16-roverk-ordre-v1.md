@@ -22,7 +22,7 @@
 - Create: `vitest.config.ts`, `.env.example`
 - Modify: `package.json` (scripts), `.gitignore`
 
-- [ ] **Step 1: Scaffold Next.js i eksisterende repo**
+- [x] **Step 1: Scaffold Next.js i eksisterende repo**
 
 ```bash
 cd /Users/joakimlehn/dev/roverk-ordre
@@ -31,14 +31,14 @@ npx --yes create-next-app@15 . --ts --tailwind --app --src-dir --eslint --import
 
 Hvis create-next-app nekter pga. eksisterende filer: flytt `docs/` midlertidig ut, kjør kommandoen, flytt tilbake.
 
-- [ ] **Step 2: Installer avhengigheter**
+- [x] **Step 2: Installer avhengigheter**
 
 ```bash
 npm install @neondatabase/serverless @supabase/ssr @supabase/supabase-js
 npm install -D vitest
 ```
 
-- [ ] **Step 3: Legg til vitest-config og scripts**
+- [x] **Step 3: Legg til vitest-config og scripts**
 
 `vitest.config.ts`:
 ```ts
@@ -57,7 +57,7 @@ I `package.json` under `scripts`, legg til:
 "db:migrate": "node scripts/migrate.mjs"
 ```
 
-- [ ] **Step 4: `.env.example`**
+- [x] **Step 4: `.env.example`**
 
 ```bash
 # Samme Neon-database som roverk.no-nettsiden (orders/leads)
@@ -67,14 +67,14 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 ```
 
-- [ ] **Step 5: Verifiser at bygget går**
+- [x] **Step 5: Verifiser at bygget går**
 
 ```bash
 npm run build
 ```
 Expected: bygger uten feil (standard startside).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A && git commit -m "chore: scaffold Next.js 15 + vitest"
@@ -88,7 +88,7 @@ git add -A && git commit -m "chore: scaffold Next.js 15 + vitest"
 - Create: `db/migrations/001-ordre-dashboard.sql`
 - Create: `scripts/migrate.mjs`
 
-- [ ] **Step 1: Skriv migreringen**
+- [x] **Step 1: Skriv migreringen**
 
 `db/migrations/001-ordre-dashboard.sql`:
 ```sql
@@ -107,7 +107,7 @@ create table if not exists allowed_emails (
 );
 ```
 
-- [ ] **Step 2: Skriv migrerings-script**
+- [x] **Step 2: Skriv migrerings-script**
 
 `scripts/migrate.mjs`:
 ```js
@@ -133,13 +133,13 @@ for (const f of readdirSync(dir).sort()) {
 console.log('Ferdig.');
 ```
 
-- [ ] **Step 3: Kjør hvis DATABASE_URL finnes lokalt, ellers hopp over**
+- [x] **Step 3: Kjør hvis DATABASE_URL finnes lokalt, ellers hopp over**
 
 ```bash
 [ -f .env.local ] && npm run db:migrate || echo "Ingen .env.local – kjøres ved oppsett"
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add db scripts && git commit -m "feat: idempotent migrering for dashboard-kolonner + allowed_emails"
@@ -153,7 +153,7 @@ git add db scripts && git commit -m "feat: idempotent migrering for dashboard-ko
 - Create: `src/lib/status.ts`, `src/lib/kpi.ts`, `src/lib/format.ts`, `src/lib/types.ts`, `src/lib/email.ts`
 - Test: `tests/status.test.ts`, `tests/kpi.test.ts`, `tests/format.test.ts`, `tests/email.test.ts`
 
-- [ ] **Step 1: Skriv typene**
+- [x] **Step 1: Skriv typene**
 
 `src/lib/types.ts`:
 ```ts
@@ -181,7 +181,7 @@ export interface Order {
 }
 ```
 
-- [ ] **Step 2: Skriv failing tests for status**
+- [x] **Step 2: Skriv failing tests for status**
 
 `tests/status.test.ts`:
 ```ts
@@ -204,14 +204,14 @@ describe('status', () => {
 });
 ```
 
-- [ ] **Step 3: Kjør test – skal feile**
+- [x] **Step 3: Kjør test – skal feile**
 
 ```bash
 npm test
 ```
 Expected: FAIL (`Cannot find module '@/lib/status'`).
 
-- [ ] **Step 4: Implementer status.ts**
+- [x] **Step 4: Implementer status.ts**
 
 `src/lib/status.ts`:
 ```ts
@@ -231,7 +231,7 @@ export function isBuildStatus(v: unknown): v is BuildStatus {
 }
 ```
 
-- [ ] **Step 5: Failing tests for KPI**
+- [x] **Step 5: Failing tests for KPI**
 
 `tests/kpi.test.ts`:
 ```ts
@@ -276,7 +276,7 @@ describe('computeKpis', () => {
 });
 ```
 
-- [ ] **Step 6: Kjør test – skal feile. Implementer kpi.ts**
+- [x] **Step 6: Kjør test – skal feile. Implementer kpi.ts**
 
 `src/lib/kpi.ts`:
 ```ts
@@ -302,7 +302,7 @@ export function computeKpis(orders: Order[]): Kpis {
 }
 ```
 
-- [ ] **Step 7: Failing tests for format**
+- [x] **Step 7: Failing tests for format**
 
 `tests/format.test.ts`:
 ```ts
@@ -335,7 +335,7 @@ describe('format', () => {
 });
 ```
 
-- [ ] **Step 8: Kjør test – skal feile. Implementer format.ts**
+- [x] **Step 8: Kjør test – skal feile. Implementer format.ts**
 
 `src/lib/format.ts`:
 ```ts
@@ -366,7 +366,7 @@ export function formatDateNo(iso: string | null | undefined): string {
 }
 ```
 
-- [ ] **Step 9: Failing test for e-postnormalisering**
+- [x] **Step 9: Failing test for e-postnormalisering**
 
 `tests/email.test.ts`:
 ```ts
@@ -384,7 +384,7 @@ describe('normalizeEmail', () => {
 });
 ```
 
-- [ ] **Step 10: Implementer email.ts**
+- [x] **Step 10: Implementer email.ts**
 
 `src/lib/email.ts`:
 ```ts
@@ -396,14 +396,14 @@ export function normalizeEmail(raw: string): string | null {
 }
 ```
 
-- [ ] **Step 11: Kjør alle tester – grønt**
+- [x] **Step 11: Kjør alle tester – grønt**
 
 ```bash
 npm test
 ```
 Expected: alle tester PASS.
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add src/lib tests && git commit -m "feat: domenelogikk for status, KPI, formattering og e-post (TDD)"
@@ -417,7 +417,7 @@ git add src/lib tests && git commit -m "feat: domenelogikk for status, KPI, form
 - Create: `src/data/materials.ts`
 - Test: `tests/materials.test.ts`
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 `tests/materials.test.ts`:
 ```ts
@@ -437,7 +437,7 @@ describe('materialsFor', () => {
 });
 ```
 
-- [ ] **Step 2: Les kildefilene**
+- [x] **Step 2: Les kildefilene**
 
 ```bash
 cat "/Users/joakimlehn/Library/CloudStorage/Dropbox/roverk as/01-Produkter/Roverk Skjul/Kalkyler/Roverk Skjul – plukkliste (4x 4-dunk Standard Royal).csv"
@@ -445,7 +445,7 @@ cat "/Users/joakimlehn/Library/CloudStorage/Dropbox/roverk as/01-Produkter/Rover
 cat "/Users/joakimlehn/Library/CloudStorage/Dropbox/roverk as/01-Produkter/Roverk Orden/Kalkyler/Roverk Orden – kalkyle.csv"
 ```
 
-- [ ] **Step 3: Implementer materials.ts**
+- [x] **Step 3: Implementer materials.ts**
 
 Struktur (fyll `ved`- og `orden`-listene fra CSV-ene i Step 2, per enhet — for
 Ved: bruk DEL 1-radene delt på antall enheter der raden gjelder begge, ellers
@@ -501,14 +501,14 @@ export function materialsFor(site: string, _config: Record<string, unknown>): Ma
 De to `/* transkriber … */`-blokkene SKAL erstattes med faktiske rader fra
 CSV-ene under implementering (dette er data-entry fra kildefilene, ikke valgfritt).
 
-- [ ] **Step 4: Kjør tester – grønt**
+- [x] **Step 4: Kjør tester – grønt**
 
 ```bash
 npm test
 ```
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/data tests/materials.test.ts && git commit -m "feat: statisk materialbehov per produkt fra plukklister"
@@ -523,7 +523,7 @@ git add src/data tests/materials.test.ts && git commit -m "feat: statisk materia
 
 Ingen enhetstester (rene SQL-kall, holdes trivielle – jf. spec).
 
-- [ ] **Step 1: Implementer db.ts**
+- [x] **Step 1: Implementer db.ts**
 
 `src/lib/db.ts`:
 ```ts
@@ -579,14 +579,14 @@ Merk: `updateOrderFields` interpolerer kun kolonnenavn fra vår egen typed
 whitelist (nøklene i `Pick<>`), aldri brukerinput. Server actions (Task 7)
 sender bare kjente nøkler.
 
-- [ ] **Step 2: Type-sjekk**
+- [x] **Step 2: Type-sjekk**
 
 ```bash
 npx tsc --noEmit
 ```
 Expected: ingen feil.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/lib/db.ts && git commit -m "feat: neon-spørringer for ordrer og allowlist"
@@ -600,7 +600,7 @@ git add src/lib/db.ts && git commit -m "feat: neon-spørringer for ordrer og all
 - Create: `src/lib/supabase.ts`, `src/lib/auth.ts`, `src/middleware.ts`
 - Create: `src/app/login/page.tsx`, `src/app/login/actions.ts`
 
-- [ ] **Step 1: Supabase server-klient**
+- [x] **Step 1: Supabase server-klient**
 
 `src/lib/supabase.ts`:
 ```ts
@@ -625,7 +625,7 @@ export async function supabaseServer() {
 }
 ```
 
-- [ ] **Step 2: requireUser med allowlist-resjekk**
+- [x] **Step 2: requireUser med allowlist-resjekk**
 
 `src/lib/auth.ts`:
 ```ts
@@ -647,7 +647,7 @@ export async function requireUser(): Promise<{ email: string }> {
 }
 ```
 
-- [ ] **Step 3: Middleware (session-gate + refresh)**
+- [x] **Step 3: Middleware (session-gate + refresh)**
 
 `src/middleware.ts`:
 ```ts
@@ -690,7 +690,7 @@ export const config = {
 };
 ```
 
-- [ ] **Step 4: Login-actions**
+- [x] **Step 4: Login-actions**
 
 `src/app/login/actions.ts`:
 ```ts
@@ -742,7 +742,7 @@ export async function logout(): Promise<void> {
 }
 ```
 
-- [ ] **Step 5: Login-side (to steg, samme side)**
+- [x] **Step 5: Login-side (to steg, samme side)**
 
 `src/app/login/page.tsx`:
 ```tsx
@@ -799,14 +799,14 @@ export default function LoginPage() {
 }
 ```
 
-- [ ] **Step 6: Bygg og type-sjekk**
+- [x] **Step 6: Bygg og type-sjekk**
 
 ```bash
 npx tsc --noEmit && npm run build
 ```
 Expected: OK. (Kjøring mot ekte Supabase/Neon verifiseres i Task 9.)
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/lib src/middleware.ts src/app/login && git commit -m "feat: Supabase OTP-innlogging bak allowlist + middleware"
@@ -819,7 +819,7 @@ git add src/lib src/middleware.ts src/app/login && git commit -m "feat: Supabase
 **Files:**
 - Create: `src/app/ordre/[id]/actions.ts`
 
-- [ ] **Step 1: Implementer actions**
+- [x] **Step 1: Implementer actions**
 
 `src/app/ordre/[id]/actions.ts`:
 ```ts
@@ -892,7 +892,7 @@ export async function saveCustomer(id: string, formData: FormData): Promise<void
 }
 ```
 
-- [ ] **Step 2: Type-sjekk + commit**
+- [x] **Step 2: Type-sjekk + commit**
 
 ```bash
 npx tsc --noEmit
@@ -913,7 +913,7 @@ git add src/app/ordre && git commit -m "feat: server actions for statusflyt, øk
 
 Design: følg mockupen (godkjent). Farger som Tailwind-tokens i `globals.css`:
 
-- [ ] **Step 1: Tokens i globals.css (Tailwind v4 `@theme`)**
+- [x] **Step 1: Tokens i globals.css (Tailwind v4 `@theme`)**
 
 Legg til i `src/app/globals.css` etter `@import "tailwindcss";`:
 ```css
@@ -936,7 +936,7 @@ Legg til i `src/app/globals.css` etter `@import "tailwindcss";`:
 body { background: var(--color-sand); color: var(--color-ink); }
 ```
 
-- [ ] **Step 2: Layout + Header**
+- [x] **Step 2: Layout + Header**
 
 `src/app/layout.tsx` – sett `lang="no"`, tittel «Roverk Ordre», behold font-oppsettet fra scaffold.
 
@@ -958,7 +958,7 @@ export function Header({ email }: { email: string }) {
 }
 ```
 
-- [ ] **Step 3: Badge, Kpis, Filters, OrderTable**
+- [x] **Step 3: Badge, Kpis, Filters, OrderTable**
 
 `src/components/Badge.tsx`:
 ```tsx
@@ -1103,7 +1103,7 @@ export function OrderTable({ orders }: { orders: Order[] }) {
 }
 ```
 
-- [ ] **Step 4: Ordreliste-siden**
+- [x] **Step 4: Ordreliste-siden**
 
 `src/app/page.tsx`:
 ```tsx
@@ -1154,7 +1154,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
 }
 ```
 
-- [ ] **Step 5: Klientkomponenter for detaljsiden**
+- [x] **Step 5: Klientkomponenter for detaljsiden**
 
 `src/components/StatusButtons.tsx`:
 ```tsx
@@ -1302,7 +1302,7 @@ export function CustomerForm({ order }: { order: Order }) {
 }
 ```
 
-- [ ] **Step 6: Detaljsiden**
+- [x] **Step 6: Detaljsiden**
 
 `src/app/ordre/[id]/page.tsx`:
 ```tsx
@@ -1409,14 +1409,14 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
 }
 ```
 
-- [ ] **Step 7: Bygg + tester**
+- [x] **Step 7: Bygg + tester**
 
 ```bash
 npx tsc --noEmit && npm test && npm run build
 ```
 Expected: alt grønt.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add -A && git commit -m "feat: ordreliste med KPI/filtre og ordredetaljer med materialbehov"
@@ -1429,7 +1429,7 @@ git add -A && git commit -m "feat: ordreliste med KPI/filtre og ordredetaljer me
 **Files:**
 - Create: `README.md`, `scripts/add-email.mjs`
 
-- [ ] **Step 1: Allowlist-hjelper**
+- [x] **Step 1: Allowlist-hjelper**
 
 `scripts/add-email.mjs`:
 ```js
@@ -1448,20 +1448,20 @@ await sql.query(
 console.log('La til', email);
 ```
 
-- [ ] **Step 2: README med oppsett-steg**
+- [x] **Step 2: README med oppsett-steg**
 
 `README.md` skal dekke: hva appen er, env-variabler (fra `.env.example`),
 Supabase-oppsett (nytt prosjekt → Auth → Email OTP, norsk e-postmal, kopiér
 URL/anon key), `npm run db:migrate`, `node --env-file=.env.local scripts/add-email.mjs <epost>`,
 `npm run dev`, deploy til Vercel med domene `ordre.roverk.no`. Skriv den ut i sin helhet.
 
-- [ ] **Step 3: Kjør appen lokalt hvis env finnes**
+- [x] **Step 3: Kjør appen lokalt hvis env finnes**
 
 Med `.env.local` på plass: start dev-server via preview-verktøyet, logg inn med
 en allowlist-e-post, sjekk liste + detalj + statusendring. Uten env: noter i
 README at dette gjenstår, og verifiser kun `npm run build`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add -A && git commit -m "docs: README med oppsett + allowlist-script"
@@ -1471,16 +1471,16 @@ git add -A && git commit -m "docs: README med oppsett + allowlist-script"
 
 ### Task 10: Ferdigstilling
 
-- [ ] **Step 1: Kjør full verifisering**
+- [x] **Step 1: Kjør full verifisering**
 
 ```bash
 npx tsc --noEmit && npm test && npm run build
 ```
 Expected: grønt.
 
-- [ ] **Step 2: Selvreview mot spec** – gå gjennom spec-fila punkt for punkt og
+- [x] **Step 2: Selvreview mot spec** – gå gjennom spec-fila punkt for punkt og
   bekreft at hver v1-funksjon finnes. Avvik fikses før ferdigmelding.
 
-- [ ] **Step 3: Rapportér til Joakim** hva som gjenstår manuelt:
+- [x] **Step 3: Rapportér til Joakim** hva som gjenstår manuelt:
   Supabase-prosjekt + env-verdier, `db:migrate` mot prod-Neon, allowlist-e-poster,
   Vercel-prosjekt + `ordre.roverk.no`, validering av materiallister mot kalkylene.

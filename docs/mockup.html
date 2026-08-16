@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roverk Ordre – mockup</title>
+<style>
+  :root{
+    --orange:#DE7214; --orange-dark:#B85C0E;
+    --bg:#F6F4F1; --card:#FFFFFF; --ink:#26221E; --muted:#7A736B;
+    --line:#E7E2DB; --green:#2E7D46; --green-bg:#E3F2E8;
+    --blue:#2A5FA8; --blue-bg:#E5EEFA; --gray-bg:#EFECE7;
+    --red:#B3402E; --red-bg:#F7E7E3; --yellow-bg:#FBF0DC; --yellow:#9A6A12;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:32px 24px;line-height:1.45}
+  .mock-label{max-width:1240px;margin:0 auto 10px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .mock-label span{background:var(--orange);color:#fff;border-radius:4px;padding:2px 8px;margin-right:8px}
+  .screen{max-width:1240px;margin:0 auto 56px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 30px rgba(38,34,30,.08);overflow:hidden}
+
+  /* ---------- Login ---------- */
+  .login{display:flex;align-items:center;justify-content:center;min-height:420px;background:linear-gradient(135deg,#FBF7F2 0%,#F3EDE5 100%)}
+  .login-card{width:360px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:32px;box-shadow:0 4px 18px rgba(38,34,30,.07)}
+  .brand{font-weight:800;font-size:20px;letter-spacing:.02em;margin-bottom:4px}
+  .brand b{color:var(--orange)}
+  .login-card p{font-size:14px;color:var(--muted);margin-bottom:20px}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px}
+  .field input{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:15px}
+  .btn{display:inline-block;border:0;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer}
+  .btn-primary{background:var(--orange);color:#fff;width:100%;margin-top:16px}
+  .pin-row{display:flex;gap:8px;margin-top:20px}
+  .pin-row input{width:44px;height:52px;text-align:center;font-size:22px;font-weight:700;border:1.5px solid var(--line);border-radius:8px}
+  .pin-row input:first-child{border-color:var(--orange)}
+  .hint{font-size:12px;color:var(--muted);margin-top:14px}
+
+  /* ---------- App chrome ---------- */
+  header.app{display:flex;align-items:center;gap:20px;padding:14px 24px;border-bottom:1px solid var(--line);background:#fff}
+  header.app .brand{font-size:17px;margin:0}
+  header.app .spacer{flex:1}
+  .userchip{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  .userchip .avatar{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+  .layout{display:grid;grid-template-columns:1fr 430px;min-height:640px}
+  .main{padding:20px 24px;border-right:1px solid var(--line)}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .kpi{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi .n{font-size:24px;font-weight:800}
+  .kpi .t{font-size:12px;color:var(--muted)}
+  .kpi.hot .n{color:var(--orange)}
+
+  /* Filters */
+  .filters{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  .filters input[type=search]{flex:1;min-width:180px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px}
+  .filters select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;background:#fff;color:var(--ink)}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr.sel{background:#FDF3EA;box-shadow:inset 3px 0 0 var(--orange)}
+  tr.test td{opacity:.45}
+  .prod{font-weight:600}
+  .prod small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+  .badge{display:inline-block;font-size:11.5px;font-weight:700;border-radius:20px;padding:3px 10px;white-space:nowrap}
+  .b-new{background:var(--yellow-bg);color:var(--yellow)}
+  .b-building{background:var(--blue-bg);color:var(--blue)}
+  .b-built{background:var(--gray-bg);color:var(--ink)}
+  .b-mounted{background:var(--green-bg);color:var(--green)}
+  .b-test{background:var(--red-bg);color:var(--red)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+  .pay{font-size:12px;color:var(--muted);white-space:nowrap}
+  .pay .ok{color:var(--green);font-weight:700}
+  .pay .no{color:var(--muted)}
+
+  /* Detail panel */
+  .detail{padding:20px 22px;background:#FDFCFA}
+  .detail h2{font-size:18px;margin-bottom:2px}
+  .detail .sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+  .sect{margin-bottom:18px}
+  .sect h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px}
+  .kv{display:grid;grid-template-columns:120px 1fr;row-gap:5px;font-size:13.5px}
+  .kv .k{color:var(--muted)}
+  .statusbtns{display:flex;gap:6px;flex-wrap:wrap}
+  .sbtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+  .sbtn.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+  .checks{display:flex;gap:18px;font-size:14px}
+  .checks label{display:flex;gap:7px;align-items:center}
+  .datefield input{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;background:#fff}
+  textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13.5px;min-height:74px;background:#fff;resize:vertical;font-family:inherit}
+  .mat table{font-size:13px}
+  .mat td,.mat th{padding:6px 8px}
+  .mat tfoot td{border-bottom:0;color:var(--muted);font-size:12px}
+  .rowbtns{display:flex;gap:8px;margin-top:6px}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .btn-sm{padding:8px 14px;font-size:13px}
+  .testflag{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+</style>
+</head>
+<body>
+
+<div class="mock-label"><span>Skjerm 1</span> Innlogging – e-post + PIN-kode (Supabase Auth, kun allowlist)</div>
+<div class="screen">
+  <div class="login">
+    <div class="login-card">
+      <div class="brand">ROVERK<b>.</b> Ordre</div>
+      <p>Logg inn med jobb-e-posten din, så sender vi deg en engangskode.</p>
+      <div class="field">
+        <label>E-post</label>
+        <input type="email" value="ola@snekker.no">
+      </div>
+      <button class="btn btn-primary">Send meg kode</button>
+      <div class="pin-row">
+        <input value="4"><input value="8"><input value="2"><input value=""><input value=""><input value="">
+      </div>
+      <div class="hint">Skriv inn den 6-sifrede koden fra e-posten. Ukjente e-poster får ikke kode.</div>
+    </div>
+  </div>
+</div>
+
+<div class="mock-label"><span>Skjerm 2</span> Dashboard – ordreliste med detaljpanel</div>
+<div class="screen">
+  <header class="app">
+    <div class="brand">ROVERK<b>.</b> Ordre</div>
+    <div class="spacer"></div>
+    <div class="userchip"><div class="avatar">OL</div> ola@snekker.no · Logg ut</div>
+  </header>
+  <div class="layout">
+    <div class="main">
+      <div class="kpis">
+        <div class="kpi hot"><div class="n">3</div><div class="t">Nye ordrer</div></div>
+        <div class="kpi"><div class="n">2</div><div class="t">Under bygging</div></div>
+        <div class="kpi"><div class="n">4</div><div class="t">Montert, ikke fakturert</div></div>
+        <div class="kpi"><div class="n">86 400 kr</div><div class="t">Utestående (fakturert, ikke betalt)</div></div>
+      </div>
+      <div class="filters">
+        <input type="search" placeholder="Søk på navn, e-post, telefon …">
+        <select><option>Alle produkter</option><option>Skjul</option><option>Ved</option><option>Orden</option></select>
+        <select><option>Alle statuser</option><option>Ny</option><option>Under bygging</option><option>Bygd</option><option>Montert</option></select>
+        <select><option>Faktura: alle</option><option>Ikke fakturert</option><option>Fakturert, ikke betalt</option><option>Betalt</option></select>
+        <label class="toggle"><input type="checkbox" checked> Skjul testordrer</label>
+      </div>
+      <table>
+        <thead><tr><th>Mottatt</th><th>Produkt</th><th>Kunde</th><th>Pris</th><th>Byggstatus</th><th>Faktura</th><th>Byggedato</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>16. aug</td>
+            <td class="prod">Skjul 2×3<small>Torvtak · Jernvitriol grå</small></td>
+            <td>Kari Nordmann<small style="display:block;color:var(--muted);font-size:12px">Trondheim</small></td>
+            <td>64 900 kr</td>
+            <td><span class="badge b-new">Ny</span></td>
+            <td class="pay"><span class="no">–</span></td>
+            <td class="pay">–</td>
+          </tr>
+          <tr class="sel">
+            <td>14. aug</td>
+            <td class="prod">Ved 1,8×0,6<small>Dobbel · Ubehandlet</small></td>
+            <td>Per Hansen<small style="display:block;color:var(--muted);font-size:12px">Melhus</small></td>
+            <td>18 400 kr</td>
+            <td><span class="badge b-building">Under bygging</span></td>
+            <td class="pay"><span class="no">Ikke fakturert</span></td>
+            <td class="pay">22. aug</td>
+          </tr>
+          <tr>
+            <td>11. aug</td>
+            <td class="prod">Skjul 2×2<small>Pulttak · Sort</small></td>
+            <td>Lise Berg<small style="display:block;color:var(--muted);font-size:12px">Stjørdal</small></td>
+            <td>52 300 kr</td>
+            <td><span class="badge b-mounted">Montert</span></td>
+            <td class="pay"><span class="ok">✓ Fakturert</span> · <span class="no">ikke betalt</span></td>
+            <td class="pay">9. aug</td>
+          </tr>
+          <tr>
+            <td>4. aug</td>
+            <td class="prod">Orden garasjeinnredning<small>3 seksjoner</small></td>
+            <td>Nils Vik<small style="display:block;color:var(--muted);font-size:12px">Trondheim</small></td>
+            <td>34 000 kr</td>
+            <td><span class="badge b-mounted">Montert</span></td>
+            <td class="pay"><span class="ok">✓ Fakturert · ✓ Betalt</span></td>
+            <td class="pay">1. aug</td>
+          </tr>
+          <tr class="test">
+            <td>2. aug</td>
+            <td class="prod">Skjul 2×3<small>Torvtak</small></td>
+            <td>Joakim (test)</td>
+            <td>64 900 kr</td>
+            <td><span class="badge b-test">TEST</span></td>
+            <td class="pay">–</td>
+            <td class="pay">–</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <aside class="detail">
+      <h2>Ved 1,8×0,6 – Per Hansen</h2>
+      <div class="sub">Mottatt 14. aug 2026 · #a3f1…9c</div>
+
+      <div class="sect">
+        <h3>Byggstatus</h3>
+        <div class="statusbtns">
+          <button class="sbtn">Ny</button>
+          <button class="sbtn active">Under bygging</button>
+          <button class="sbtn">Bygd</button>
+          <button class="sbtn">Montert</button>
+        </div>
+      </div>
+
+      <div class="sect">
+        <h3>Økonomi</h3>
+        <div class="checks">
+          <label><input type="checkbox"> Fakturert</label>
+          <label><input type="checkbox"> Betalt</label>
+          <span style="margin-left:auto;font-weight:700">18 400 kr</span>
+        </div>
+      </div>
+
+      <div class="sect datefield">
+        <h3>Planlagt byggedato</h3>
+        <input type="date" value="2026-08-22">
+      </div>
+
+      <div class="sect">
+        <h3>Kunde <span style="float:right;font-weight:400;text-transform:none;letter-spacing:0"><a href="#" style="color:var(--orange)">Rediger</a></span></h3>
+        <div class="kv">
+          <div class="k">Navn</div><div>Per Hansen</div>
+          <div class="k">Telefon</div><div><a href="#" style="color:var(--ink)">974 12 345</a></div>
+          <div class="k">E-post</div><div>per@epost.no</div>
+          <div class="k">Adresse</div><div>Granvegen 12, 7224 Melhus</div>
+          <div class="k">Ønsket dato</div><div>Uke 35 (kundens ønske)</div>
+        </div>
+      </div>
+
+      <div class="sect">
+        <h3>Bestilling</h3>
+        <div class="kv">
+          <div class="k">Produkt</div><div>Roverk Ved 1,8 × 0,6 m</div>
+          <div class="k">Tilvalg</div><div>Dobbel bredde, ubehandlet kledning</div>
+        </div>
+      </div>
+
+      <div class="sect mat">
+        <h3>Materialbehov</h3>
+        <table>
+          <thead><tr><th>Materiale</th><th>Dim.</th><th>Antall</th></tr></thead>
+          <tbody>
+            <tr><td>Impregnert justert</td><td>48×98</td><td>6 stk à 4,2 m</td></tr>
+            <tr><td>Kledning rektangulær</td><td>19×123</td><td>28 stk à 3,6 m</td></tr>
+            <tr><td>Taktro / lekt</td><td>30×48</td><td>8 stk à 3,0 m</td></tr>
+            <tr><td>Skruer utendørs</td><td>4,2×55</td><td>2 pk</td></tr>
+          </tbody>
+          <tfoot><tr><td colspan="3">Fast liste for Ved 1,8×0,6 dobbel – fra kalkyle v2.1</td></tr></tfoot>
+        </table>
+      </div>
+
+      <div class="sect">
+        <h3>Interne notater</h3>
+        <textarea>15/8: Ringte kunden – vil helst ha levering før uke 35. Bekreftet.</textarea>
+        <div class="rowbtns"><button class="btn btn-ghost btn-sm">Lagre notat</button></div>
+      </div>
+
+      <div class="testflag">
+        <label><input type="checkbox"> Marker som testordre</label>
+        <span style="margin-left:auto;font-size:12px">Skjules fra tall og lister</span>
+      </div>
+    </aside>
+  </div>
+</div>
+
+</body>
+</html>

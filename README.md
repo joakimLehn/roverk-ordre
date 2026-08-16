@@ -51,6 +51,13 @@ npm test           # vitest (domenelogikk)
 npm run build      # produksjonsbygg
 ```
 
+## Manuelle ordrer
+
+Bestillinger som kommer via e-post, Instagram eller telefon legges inn med
+«+ Ny ordre» på hovedsiden. Kun produkt og kundenavn er påkrevd. Kanal og
+hvem som registrerte ordren lagres i `config`. Byggstatus og fakturert/betalt
+kan endres direkte fra ordrelista.
+
 ## Statusmodell
 
 - **Byggstatus** (fri veksling): Ny → Under bygging → Bygd → Montert

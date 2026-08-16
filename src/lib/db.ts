@@ -48,6 +48,30 @@ export async function updateOrderFields(
   );
 }
 
+export interface NewManualOrder {
+  site: string;
+  product: string | null;
+  config: Record<string, unknown>;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  price_nok: number | null;
+  preferred_date: string | null;
+  internal_notes: string | null;
+}
+
+export async function insertManualOrder(o: NewManualOrder): Promise<string> {
+  const rows = (await sql().query(
+    `insert into orders (site, product, config, name, phone, email, address, price_nok, preferred_date, internal_notes)
+     values ($1, $2, $3::jsonb, $4, $5, $6, $7, $8, $9, $10)
+     returning id`,
+    [o.site, o.product, JSON.stringify(o.config), o.name, o.phone, o.email,
+     o.address, o.price_nok, o.preferred_date, o.internal_notes],
+  )) as { id: string }[];
+  return rows[0].id;
+}
+
 export async function isEmailAllowed(email: string): Promise<boolean> {
   const rows = (await sql().query(
     'select 1 from allowed_emails where email = $1',

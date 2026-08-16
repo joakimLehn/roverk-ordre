@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Order } from '@/lib/types';
-import { StatusBadge, TestBadge } from './Badge';
+import { TestBadge } from './Badge';
+import { StatusSelect, InlineEconomy } from './InlineControls';
 import { formatDateNo, formatPrice, siteLabel } from '@/lib/format';
 
 const td = 'border-b border-line px-3 py-2.5';
@@ -44,16 +45,10 @@ export function OrderTable({ orders }: { orders: Order[] }) {
               </td>
               <td className={`${td} whitespace-nowrap`}>{formatPrice(o.price_nok)}</td>
               <td className={td}>
-                {o.is_test ? <TestBadge /> : <StatusBadge status={o.build_status} />}
+                {o.is_test ? <TestBadge /> : <StatusSelect orderId={o.id} current={o.build_status} />}
               </td>
-              <td className={`${td} text-xs whitespace-nowrap`}>
-                {o.paid_at ? (
-                  <span className="font-bold text-ok">✓ Betalt</span>
-                ) : o.invoiced_at ? (
-                  <span><span className="font-bold text-ok">✓ Fakturert</span> · ikke betalt</span>
-                ) : (
-                  <span className="text-muted">–</span>
-                )}
+              <td className={td}>
+                <InlineEconomy orderId={o.id} invoiced={!!o.invoiced_at} paid={!!o.paid_at} />
               </td>
               <td className={`${td} text-xs whitespace-nowrap`}>{formatDateNo(o.planned_build_date)}</td>
             </tr>

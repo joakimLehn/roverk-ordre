@@ -54,13 +54,15 @@ export async function saveCustomer(id: string, formData: FormData): Promise<void
   await requireUser();
   const name = String(formData.get('name') ?? '').trim();
   const phone = String(formData.get('phone') ?? '').trim();
-  const email = normalizeEmail(String(formData.get('email') ?? ''));
+  const emailRaw = String(formData.get('email') ?? '').trim();
+  const email = emailRaw ? normalizeEmail(emailRaw) : null;
   const address = String(formData.get('address') ?? '').trim();
   const pd = String(formData.get('preferred_date') ?? '').trim();
-  if (!name || !phone || !email) throw new Error('Navn, telefon og gyldig e-post er påkrevd');
+  if (!name) throw new Error('Navn er påkrevd');
+  if (emailRaw && !email) throw new Error('Ugyldig e-postadresse');
   await updateOrderFields(id, {
     name,
-    phone,
+    phone: phone || null,
     email,
     address: address || null,
     preferred_date: ISO_DATE_RE.test(pd) ? pd : null,

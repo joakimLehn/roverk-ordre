@@ -8,8 +8,8 @@ export interface Order {
   config: Record<string, unknown>;
   preferred_date: string | null; // ISO date
   name: string;
-  phone: string;
-  email: string;
+  phone: string | null;  // manuelle ordrer kan mangle telefon/e-post
+  email: string | null;
   address: string | null;
   address_meta: { poststed?: string | null } & Record<string, unknown>;
   price_nok: number | null;

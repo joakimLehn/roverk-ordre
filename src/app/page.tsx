@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { requireUser } from '@/lib/auth';
 import { listOrders } from '@/lib/db';
 import { computeKpis } from '@/lib/kpi';
@@ -22,8 +23,8 @@ function applyFilters(orders: Order[], p: FilterParams): Order[] {
     r = r.filter(
       (o) =>
         o.name.toLowerCase().includes(q) ||
-        o.email.toLowerCase().includes(q) ||
-        o.phone.includes(q),
+        (o.email ?? '').toLowerCase().includes(q) ||
+        (o.phone ?? '').includes(q),
     );
   }
   return r;
@@ -44,6 +45,15 @@ export default async function Home({
     <>
       <Header email={email} />
       <main className="mx-auto max-w-6xl px-6 py-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h1 className="text-lg font-bold">Ordrer</h1>
+          <Link
+            href="/ordre/ny"
+            className="rounded-lg bg-brand px-3.5 py-2 text-[13px] font-semibold text-white"
+          >
+            + Ny ordre
+          </Link>
+        </div>
         <KpiRow kpis={kpis} />
         <Filters params={params} />
         <OrderTable orders={filtered} />

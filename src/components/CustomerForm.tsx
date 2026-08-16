@@ -13,9 +13,17 @@ export function CustomerForm({ order }: { order: Order }) {
       <div className="grid grid-cols-[110px_1fr] gap-y-1 text-[13.5px]">
         <span className="text-muted">Navn</span><span>{order.name}</span>
         <span className="text-muted">Telefon</span>
-        <a href={`tel:${order.phone}`} className="underline-offset-2 hover:underline">{order.phone}</a>
+        {order.phone ? (
+          <a href={`tel:${order.phone}`} className="underline-offset-2 hover:underline">{order.phone}</a>
+        ) : (
+          <span>–</span>
+        )}
         <span className="text-muted">E-post</span>
-        <a href={`mailto:${order.email}`} className="underline-offset-2 hover:underline">{order.email}</a>
+        {order.email ? (
+          <a href={`mailto:${order.email}`} className="underline-offset-2 hover:underline">{order.email}</a>
+        ) : (
+          <span>–</span>
+        )}
         <span className="text-muted">Adresse</span><span>{order.address ?? '–'}</span>
         <span className="text-muted">Ønsket dato</span><span>{order.preferred_date ?? '–'}</span>
         <button
@@ -35,8 +43,8 @@ export function CustomerForm({ order }: { order: Order }) {
       className="grid gap-2 text-sm"
     >
       <input name="name" defaultValue={order.name} placeholder="Navn" required className={input} />
-      <input name="phone" defaultValue={order.phone} placeholder="Telefon" required className={input} />
-      <input name="email" type="email" defaultValue={order.email} placeholder="E-post" required className={input} />
+      <input name="phone" defaultValue={order.phone ?? ''} placeholder="Telefon" className={input} />
+      <input name="email" type="email" defaultValue={order.email ?? ''} placeholder="E-post" className={input} />
       <input name="address" defaultValue={order.address ?? ''} placeholder="Adresse" className={input} />
       <label className="text-xs text-muted">
         Ønsket dato

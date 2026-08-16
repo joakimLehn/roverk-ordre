@@ -19,6 +19,9 @@ Implementasjonsplan: `docs/superpowers/plans/2026-08-16-roverk-ordre-v1.md`
 skrives av roverk.no-nettsiden (eget repo: `roverk as/03-Nettsider`, deployes
 separat til Vercel). Denne appen:
 
+- oppretter manuelle ordrer (bestillinger via e-post/Instagram/telefon) med
+  `config: { manuell: true, kanal, registrert_av }` – nettsidens ordrer har
+  aldri disse config-nøklene
 - leser `orders` og oppdaterer KUN kolonnene den selv har lagt til:
   `build_status`, `invoiced_at`, `paid_at`, `is_test`, `planned_build_date`,
   `internal_notes` – pluss kundefeltene (`name`, `phone`, `email`, `address`,

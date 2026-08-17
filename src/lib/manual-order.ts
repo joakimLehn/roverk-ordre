@@ -28,8 +28,19 @@ function intInRange(raw: string, min: number, max: number): number | null {
   return Number.isInteger(n) && n >= min && n <= max ? n : null;
 }
 
+/** Tom streng → null; «12 500» → 12500; ugyldig/negativ → feil. */
+export function parsePriceNok(
+  raw: string | undefined,
+): { ok: true; value: number | null } | { ok: false; error: string } {
+  const priceRaw = (raw ?? '').replace(/[\s.]/g, '').replace(',', '.');
+  if (!priceRaw) return { ok: true, value: null };
+  const n = Number(priceRaw);
+  if (!Number.isFinite(n) || n < 0) return { ok: false, error: 'Ugyldig pris.' };
+  return { ok: true, value: Math.round(n) };
+}
+
 /** Bygger config (nettsidens skjema) + generert produkttekst per produkt. */
-function buildProduct(site: string, f: Record<string, string>):
+export function buildProduct(site: string, f: Record<string, string>):
   | { config: Record<string, unknown>; productText: string }
   | { error: string } {
   if (site === 'skjul') {
@@ -82,13 +93,9 @@ export function parseManualOrder(f: Record<string, string>): ParseResult {
   const email = emailRaw ? normalizeEmail(emailRaw) : null;
   if (emailRaw && !email) return { ok: false, error: 'Ugyldig e-postadresse.' };
 
-  let price_nok: number | null = null;
-  const priceRaw = (f.price_nok ?? '').replace(/[\s.]/g, '').replace(',', '.');
-  if (priceRaw) {
-    const n = Number(priceRaw);
-    if (!Number.isFinite(n) || n < 0) return { ok: false, error: 'Ugyldig pris.' };
-    price_nok = Math.round(n);
-  }
+  const price = parsePriceNok(f.price_nok);
+  if (!price.ok) return { ok: false, error: price.error };
+  const price_nok = price.value;
 
   const pd = (f.preferred_date ?? '').trim();
   const kanal = (f.kanal ?? '').trim();

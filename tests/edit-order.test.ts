@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseBestillingEdit } from '@/lib/edit-order';
+import { parseBestillingEdit, bestillingFormDefaults, NEW_ORDER_FIELD_DEFAULTS } from '@/lib/edit-order';
 import { buildProduct } from '@/lib/manual-order';
 
 const NAA = '2026-08-17T12:00:00.000Z';
@@ -172,5 +172,83 @@ describe('parseBestillingEdit', () => {
       NAA,
     );
     expect(r.ok && r.data.product).toBe('Vedskjul Medium');
+  });
+});
+
+describe('bestillingFormDefaults', () => {
+  it('skjul: mapper config til skjemafelter som parseBestillingEdit forstår', () => {
+    const config = {
+      count: 6,
+      serie: 'XL',
+      kledning: 'royal',
+      montering: false,
+      forankring: true,
+    };
+    const defaults = bestillingFormDefaults('skjul', config);
+    expect(defaults).toEqual({
+      ...NEW_ORDER_FIELD_DEFAULTS,
+      skjul_count: '6',
+      skjul_serie: 'XL',
+      skjul_kledning: 'royal',
+      skjul_montering: false,
+      skjul_forankring: true,
+    });
+
+    const fields: Record<string, string> = {
+      skjul_count: defaults!.skjul_count,
+      skjul_serie: defaults!.skjul_serie,
+      skjul_kledning: defaults!.skjul_kledning,
+    };
+    if (defaults!.skjul_forankring) fields.skjul_forankring = 'on';
+    const r = parseBestillingEdit({ site: 'skjul', config, price_nok: null }, fields, REDIGERER, NAA);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.data.product).toBe('6-dunk XL');
+    expect(r.data.config).toMatchObject(config);
+  });
+
+  it('ukjent site → null (skjemaet skal ikke vises)', () => {
+    expect(bestillingFormDefaults('tull', { count: 4 })).toBeNull();
+  });
+
+  it('manglende nøkler faller tilbake til NewOrder-defaults', () => {
+    expect(bestillingFormDefaults('skjul', {})).toMatchObject({
+      skjul_count: '4',
+      skjul_serie: 'Standard',
+      skjul_kledning: 'ubeh',
+      skjul_montering: true,
+      skjul_forankring: false,
+    });
+    expect(bestillingFormDefaults('ved', {})?.ved_modell).toBe('Medium');
+    expect(bestillingFormDefaults('orden', {})).toMatchObject({
+      orden_bt: '60L',
+      orden_w: '3',
+      orden_h: '4',
+      orden_hjul: false,
+    });
+  });
+
+  it('orden-v2 bruker Orden-felter (bt/w/h/withWheels)', () => {
+    const defaults = bestillingFormDefaults('orden-v2', {
+      bt: '100L',
+      w: 2,
+      h: 5,
+      withWheels: true,
+    });
+    expect(defaults).toMatchObject({
+      orden_bt: '100L',
+      orden_w: '2',
+      orden_h: '5',
+      orden_hjul: true,
+    });
+  });
+
+  it('ugyldig kledning/navn faller tilbake, ikke gjennom som råverdi', () => {
+    expect(bestillingFormDefaults('skjul', { kledning: 'beis' })?.skjul_kledning).toBe('ubeh');
+    expect(bestillingFormDefaults('ved', { navn: 'Spesial' })?.ved_modell).toBe('Medium');
+  });
+
+  it('ved: size brukes når navn mangler', () => {
+    expect(bestillingFormDefaults('ved', { size: 'stor' })?.ved_modell).toBe('Stor');
   });
 });

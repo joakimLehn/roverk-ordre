@@ -10,6 +10,8 @@ import { StatusButtons } from '@/components/StatusButtons';
 import { EconomyChecks, TestFlag } from '@/components/EconomyChecks';
 import { NotesForm, PlannedDate } from '@/components/NotesForm';
 import { CustomerForm } from '@/components/CustomerForm';
+import { BestillingForm } from '@/components/BestillingForm';
+import { schemaSite } from '@/lib/edit-order';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,19 +65,9 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           <CustomerForm order={order} />
         </Section>
 
-        {cfg.length > 0 ? (
+        {cfg.length > 0 || schemaSite(order.site) ? (
           <Section title="Bestilling">
-            <div className="overflow-hidden rounded-xl border border-line bg-white">
-              {cfg.map((r) => (
-                <div
-                  key={r.key}
-                  className="flex justify-between gap-4 border-b border-line px-3.5 py-2.5 text-sm last:border-b-0"
-                >
-                  <span className="text-muted">{r.key}</span>
-                  <span className="text-right font-semibold">{r.value}</span>
-                </div>
-              ))}
-            </div>
+            <BestillingForm order={order} />
           </Section>
         ) : null}
 

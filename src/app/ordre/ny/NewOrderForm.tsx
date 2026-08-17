@@ -4,88 +4,10 @@ import Link from 'next/link';
 import { useActionState, useState } from 'react';
 import { createOrder, type NewOrderState } from './actions';
 import { KANALER } from '@/lib/manual-order';
+import { ProductConfigFields } from '@/components/ProductConfigFields';
 
 const input = 'min-h-[46px] w-full rounded-lg border border-line bg-white px-3 py-2 text-base sm:text-sm';
 const label = 'block text-xs font-semibold text-muted';
-
-function SkjulFields() {
-  return (
-    <fieldset className="grid gap-3 rounded-xl border border-line bg-sand/60 p-3.5">
-      <legend className="px-1 text-xs font-semibold text-muted">Skjul-konfigurasjon</legend>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <label className={label}>
-          Antall dunker *
-          <select name="skjul_count" defaultValue="4" className={`${input} mt-1`}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </label>
-        <label className={label}>
-          Serie *
-          <select name="skjul_serie" defaultValue="Standard" className={`${input} mt-1`}>
-            <option value="Standard">Standard</option>
-            <option value="XL">XL</option>
-          </select>
-        </label>
-        <label className={label}>
-          Kledning *
-          <select name="skjul_kledning" defaultValue="ubeh" className={`${input} mt-1`}>
-            <option value="ubeh">Impregnert</option>
-            <option value="royal">Royal</option>
-          </select>
-        </label>
-      </div>
-      <div className="flex gap-6">
-        <label className="flex min-h-[44px] items-center gap-2.5 text-[15px]"><input type="checkbox" name="skjul_montering" defaultChecked /> Montering</label>
-        <label className="flex min-h-[44px] items-center gap-2.5 text-[15px]"><input type="checkbox" name="skjul_forankring" /> Forankring</label>
-      </div>
-    </fieldset>
-  );
-}
-
-function VedFields() {
-  return (
-    <fieldset className="grid gap-3 rounded-xl border border-line bg-sand/60 p-3.5">
-      <legend className="px-1 text-xs font-semibold text-muted">Ved-konfigurasjon</legend>
-      <label className={label}>
-        Modell *
-        <select name="ved_modell" defaultValue="Medium" className={`${input} mt-1`}>
-          <option value="Medium">Medium</option>
-          <option value="Stor">Stor</option>
-        </select>
-      </label>
-    </fieldset>
-  );
-}
-
-function OrdenFields() {
-  return (
-    <fieldset className="grid gap-3 rounded-xl border border-line bg-sand/60 p-3.5">
-      <legend className="px-1 text-xs font-semibold text-muted">Orden-konfigurasjon</legend>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <label className={label}>
-          Kassetype *
-          <select name="orden_bt" defaultValue="60L" className={`${input} mt-1`}>
-            <option value="60L">60L</option>
-            <option value="100L">100L</option>
-          </select>
-        </label>
-        <label className={label}>
-          Bredde (kasser) *
-          <select name="orden_w" defaultValue="3" className={`${input} mt-1`}>
-            {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </label>
-        <label className={label}>
-          Høyde (kasser) *
-          <select name="orden_h" defaultValue="4" className={`${input} mt-1`}>
-            {[3, 4, 5, 6, 7].map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </label>
-      </div>
-      <label className="flex min-h-[44px] items-center gap-2.5 text-[15px]"><input type="checkbox" name="orden_hjul" /> Hjul</label>
-    </fieldset>
-  );
-}
 
 export function NewOrderForm() {
   const [state, formAction, pending] = useActionState<NewOrderState, FormData>(createOrder, {});
@@ -117,9 +39,7 @@ export function NewOrderForm() {
         </label>
       </div>
 
-      {site === 'skjul' ? <SkjulFields /> : null}
-      {site === 'ved' ? <VedFields /> : null}
-      {site === 'orden' ? <OrdenFields /> : null}
+      {site ? <ProductConfigFields site={site} /> : null}
 
       <label className={label}>
         Kundenavn *

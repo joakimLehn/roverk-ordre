@@ -61,6 +61,16 @@ export interface NewManualOrder {
   internal_notes: string | null;
 }
 
+export async function updateOrderBestilling(
+  id: string,
+  b: { config: Record<string, unknown>; product: string; price_nok: number | null },
+): Promise<void> {
+  await sql().query(
+    `update orders set config = $2::jsonb, product = $3, price_nok = $4 where id = $1`,
+    [id, JSON.stringify(b.config), b.product, b.price_nok],
+  );
+}
+
 export async function insertManualOrder(o: NewManualOrder): Promise<string> {
   const rows = (await sql().query(
     `insert into orders (site, product, config, name, phone, email, address, price_nok, preferred_date, internal_notes)

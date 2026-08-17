@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireUser } from '@/lib/auth';
-import { updateOrderFields } from '@/lib/db';
+import { getOrder, updateOrderBestilling, updateOrderFields } from '@/lib/db';
+import { parseBestillingEdit } from '@/lib/edit-order';
 import { isBuildStatus } from '@/lib/status';
 import { normalizeEmail } from '@/lib/email';
 
@@ -48,6 +49,31 @@ export async function saveNotes(id: string, notes: string): Promise<void> {
   await requireUser();
   await updateOrderFields(id, { internal_notes: notes.slice(0, 10_000) });
   done(id);
+}
+
+export interface SaveBestillingState {
+  message?: string;
+}
+
+export async function saveBestilling(
+  id: string,
+  formData: FormData,
+): Promise<SaveBestillingState> {
+  const { email } = await requireUser();
+  const order = await getOrder(id);
+  if (!order) return { message: 'Fant ikke ordren.' };
+
+  const fields: Record<string, string> = {};
+  for (const [key, value] of formData.entries()) {
+    if (typeof value === 'string') fields[key] = value;
+  }
+
+  const parsed = parseBestillingEdit(order, fields, email, new Date().toISOString());
+  if (!parsed.ok) return { message: parsed.error };
+
+  await updateOrderBestilling(id, parsed.data);
+  done(id);
+  return {};
 }
 
 export async function saveCustomer(id: string, formData: FormData): Promise<void> {

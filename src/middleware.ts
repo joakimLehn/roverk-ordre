@@ -37,5 +37,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|ico)$).*)'],
+  // Ikoner og manifest må svare uten sesjon – ellers får «legg til på
+  // hjemskjerm» en innloggingsside i stedet for et ikon.
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|apple-icon|icon|.*\\.(?:svg|png|jpg|ico)$).*)',
+  ],
 };

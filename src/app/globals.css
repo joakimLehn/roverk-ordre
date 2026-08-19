@@ -3,15 +3,27 @@
 @theme {
   --color-brand: #DE7214;
   --color-brand-dark: #B85C0E;
+  /* Oransje som holder kontrast mot mørk bakgrunn (angre-lenka i toasten). */
+  --color-brand-light: #F5A85C;
   --color-sand: #F6F4F1;
   --color-ink: #26221E;
-  --color-muted: #7A736B;
+  /* Mørknet fra #7A736B: den gamle verdien klarte 4,67:1 mot hvitt, men bare
+     4,27:1 mot sand – og sand er bakgrunnen under «Kilde:»-linja og bak
+     tabellrader ved hover. */
+  --color-muted: #6E6760;
   --color-line: #E7E2DB;
-  --color-ok: #2E7D46;
+  /* Forgrunnsfargene er justert til å klare WCAG AA (4,5:1) mot sin egen
+     bakgrunn. Merkene er 11,5 px halvfet, altså ikke «stor tekst», så det
+     lempeligere 3:1-kravet gjelder ikke. Målte verdier:
+       warn på warn-bg  4,17 → 5,05
+       ok   på ok-bg    4,40 → 4,97
+       muted på sand    4,27 → 5,10
+     info på info-bg (5,46) og danger på danger-bg (4,70) klarte det alt. */
+  --color-ok: #2A7340;
   --color-ok-bg: #E3F2E8;
   --color-info: #2A5FA8;
   --color-info-bg: #E5EEFA;
-  --color-warn: #9A6A12;
+  --color-warn: #8A5E0F;
   --color-warn-bg: #FBF0DC;
   --color-danger: #B3402E;
   --color-danger-bg: #F7E7E3;
@@ -21,4 +33,13 @@
 body {
   background: var(--color-sand);
   color: var(--color-ink);
+}
+
+/* Egendefinerte knapper mister nettleserens standardomriss. Uten en synlig
+   fokusring er tastaturbruk på skrivebordet usynlig. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
 }

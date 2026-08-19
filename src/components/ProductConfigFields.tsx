@@ -4,14 +4,14 @@ import {
   type ProductFieldDefaults,
 } from '@/lib/edit-order';
 
-const input = 'min-h-[46px] w-full rounded-lg border border-line bg-white px-3 py-2 text-base sm:text-sm';
+const input = 'min-h-[46px] w-full rounded-lg border border-line bg-white px-3 py-2 text-base md:text-sm';
 const label = 'block text-xs font-semibold text-muted';
 
 function SkjulFields({ d }: { d: ProductFieldDefaults }) {
   return (
     <fieldset className="grid gap-3 rounded-xl border border-line bg-sand/60 p-3.5">
       <legend className="px-1 text-xs font-semibold text-muted">Skjul-konfigurasjon</legend>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <label className={label}>
           Antall dunker *
           <select name="skjul_count" defaultValue={d.skjul_count} className={`${input} mt-1`}>
@@ -60,7 +60,7 @@ function OrdenFields({ d }: { d: ProductFieldDefaults }) {
   return (
     <fieldset className="grid gap-3 rounded-xl border border-line bg-sand/60 p-3.5">
       <legend className="px-1 text-xs font-semibold text-muted">Orden-konfigurasjon</legend>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <label className={label}>
           Kassetype *
           <select name="orden_bt" defaultValue={d.orden_bt} className={`${input} mt-1`}>

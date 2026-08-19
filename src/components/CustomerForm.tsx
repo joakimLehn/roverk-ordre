@@ -36,7 +36,7 @@ export function CustomerForm({ order }: { order: Order }) {
     );
   }
 
-  const input = 'min-h-[46px] w-full rounded-lg border border-line bg-white px-3 py-2 text-base sm:text-sm';
+  const input = 'min-h-[46px] w-full rounded-lg border border-line bg-white px-3 py-2 text-base md:text-sm';
   return (
     <form
       action={(fd) => start(async () => { await saveCustomer(order.id, fd); setEditing(false); })}
@@ -53,14 +53,14 @@ export function CustomerForm({ order }: { order: Order }) {
       <div className="flex gap-2">
         <button
           disabled={pending}
-          className="min-h-[46px] flex-1 cursor-pointer rounded-lg bg-brand px-3.5 text-[14.5px] font-bold text-white disabled:opacity-60 sm:min-h-0 sm:flex-none sm:py-2 sm:text-[13px] sm:font-semibold"
+          className="min-h-[46px] flex-1 cursor-pointer rounded-lg bg-brand px-3.5 text-[14.5px] font-bold text-white disabled:opacity-60 md:min-h-0 md:flex-none md:py-2 md:text-[13px] md:font-semibold"
         >
           {pending ? 'Lagrer …' : 'Lagre'}
         </button>
         <button
           type="button"
           onClick={() => setEditing(false)}
-          className="min-h-[46px] flex-1 cursor-pointer rounded-lg border border-line bg-white px-3.5 text-[14.5px] font-semibold sm:min-h-0 sm:flex-none sm:py-2 sm:text-[13px] sm:font-normal"
+          className="min-h-[46px] flex-1 cursor-pointer rounded-lg border border-line bg-white px-3.5 text-[14.5px] font-semibold md:min-h-0 md:flex-none md:py-2 md:text-[13px] md:font-normal"
         >
           Avbryt
         </button>

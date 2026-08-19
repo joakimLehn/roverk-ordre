@@ -159,10 +159,7 @@ export default async function Home({
               <OrderTable
                 orders={sorted}
                 now={now}
-                sort={params.sort}
-                selectedId={selected?.id}
-                hrefForSort={(value) => listHref(params, { sort: value })}
-                hrefForSelect={(id) => listHref(params, { valgt: id })}
+                params={{ ...params, valgt: selected?.id }}
               />
               <aside className="hidden lg:sticky lg:top-5 lg:block">
                 {selected ? (

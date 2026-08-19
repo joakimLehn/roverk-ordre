@@ -20,6 +20,19 @@ function hasDetailFilters(p: FilterParams): boolean {
   return Boolean(p.produkt || p.status || p.faktura || p.vis_test);
 }
 
+function FilterIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M3 5.5h14M6 10h8M8.5 14.5h3"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function SearchIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -58,12 +71,14 @@ export function Filters({ params }: { params: FilterParams }) {
   );
 
   return (
+    /* Én rad på mobil: søket tar plassen, filtrene er en kompakt knapp ved
+       siden. To fullbreddes rader spiste ~60 px av det bunnlinja frigjorde. */
     <div
-      className={`mb-3.5 flex flex-col gap-2.5 md:flex-row md:flex-wrap md:items-start ${
+      className={`mb-2.5 flex items-start gap-2 md:mb-3.5 md:flex-wrap ${
         pending ? 'opacity-70' : ''
       }`}
     >
-      <form method="get" className="relative flex-1 md:min-w-[220px]">
+      <form method="get" className="relative min-w-0 flex-1 md:min-w-[220px]">
         {keep}
         <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
           <SearchIcon />
@@ -78,17 +93,20 @@ export function Filters({ params }: { params: FilterParams }) {
         />
       </form>
 
-      <details
-        open={hasDetailFilters(params)}
-        className="rounded-xl border border-line bg-white md:relative md:rounded-none md:border-0 md:bg-transparent"
-      >
-        <summary className="focus-ring flex min-h-[44px] cursor-pointer list-none items-center gap-2 rounded-xl px-3.5 text-[13.5px] font-semibold text-muted md:min-h-[42px] md:rounded-lg md:border md:border-line md:bg-white md:px-3">
-          Flere filtre
-          {hasDetailFilters(params) ? <span className="ml-auto text-brand md:ml-1.5">aktivt</span> : null}
+      <details open={hasDetailFilters(params)} className="relative flex-none">
+        <summary
+          aria-label="Flere filtre"
+          className="focus-ring flex min-h-[44px] cursor-pointer list-none items-center gap-1.5 rounded-lg border border-line bg-white px-3 text-[13.5px] font-semibold text-muted md:min-h-[42px]"
+        >
+          <FilterIcon />
+          <span className="hidden md:inline">Flere filtre</span>
+          {hasDetailFilters(params) ? (
+            <span className="h-1.5 w-1.5 rounded-full bg-brand" aria-label="filter aktivt" />
+          ) : null}
         </summary>
         <form
           method="get"
-          className="flex flex-col gap-2.5 p-3.5 pt-1 md:absolute md:z-30 md:mt-1.5 md:w-[280px] md:rounded-xl md:border md:border-line md:bg-white md:p-3.5 md:shadow-lg"
+          className="absolute right-0 z-30 mt-1.5 flex w-[min(88vw,300px)] flex-col gap-2.5 rounded-xl border border-line bg-white p-3.5 shadow-lg"
         >
           {keep}
           {params.q ? <input type="hidden" name="q" value={params.q} /> : null}

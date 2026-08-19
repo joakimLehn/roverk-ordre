@@ -70,12 +70,14 @@ export function MoneyChip({
           undo: () => write(undo.field, undo.next),
         });
       }}
+      /* Ett tilgjengelighetsnavn, ikke tre kilder som slåss: den synlige
+         teksten sier tilstanden, aria-label sier tilstand + handling. */
+      aria-label={`${label} – marker som ${done}`}
       title={`Marker som ${done}`}
       className={`focus-ring flex min-h-[38px] cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-2.5 text-[12.5px] font-bold ${STYLES[money.value]} ${className}`}
     >
       {money.value === 0 ? null : <span aria-hidden="true">✓</span>}
       {label}
-      <span className="sr-only">— trykk for å markere som {done}</span>
     </button>
   );
 }

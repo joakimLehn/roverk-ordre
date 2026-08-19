@@ -12,6 +12,7 @@ import { SAVE_ERROR } from './useOptimisticField';
 import { setInvoicedBulk } from '@/app/ordre/[id]/actions';
 import { ageInDays, isStale } from '@/lib/age';
 import { SORT_COLUMNS, parseSort, toggleSort, type SortKey } from '@/lib/sort';
+import { listHref } from '@/lib/views';
 import { formatDateNo, formatPrice, materialLabel, siteLabel } from '@/lib/format';
 
 const td = 'border-b border-line px-3 py-2.5';
@@ -30,24 +31,22 @@ function SortArrow({ desc }: { desc: boolean }) {
 export function OrderTable({
   orders,
   now,
-  selectedId,
-  sort,
-  hrefForSort,
-  hrefForSelect,
+  params,
 }: {
   orders: Order[];
   now: string;
-  /** Ordren som står i sidepanelet, når panelet er i bruk. */
-  selectedId?: string;
-  sort?: string;
-  hrefForSort: (value: string) => string;
-  hrefForSelect: (id: string) => string;
+  /* Listetilstanden kommer som et vanlig objekt, ikke som href-byggere:
+     funksjoner kan ikke krysse grensa til en klientkomponent. Lenkene bygges
+     her med listHref, som er ren og importerbar på begge sider. */
+  params: Record<string, string | undefined>;
 }) {
   const router = useRouter();
   const toast = useToast();
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [bulkPending, startBulk] = useTransition();
   const [cursor, setCursor] = useState<number>(-1);
+  const sort = params.sort;
+  const selectedId = params.valgt;
   const active = parseSort(sort);
   const bodyRef = useRef<HTMLTableSectionElement>(null);
 
@@ -67,12 +66,12 @@ export function OrderTable({
       // På brede skjermer fyller raden sidepanelet og lista står. Ellers er
       // detaljene en egen side – som også er det som skjer uten JS.
       if (window.matchMedia(PANEL_QUERY).matches) {
-        router.replace(hrefForSelect(id), { scroll: false });
+        router.replace(listHref(params, { valgt: id }), { scroll: false });
       } else {
         router.push(`/ordre/${id}`);
       }
     },
-    [router, hrefForSelect],
+    [router, params],
   );
 
   // Tastatur: dette er en app noen bruker hver dag.
@@ -193,13 +192,13 @@ export function OrderTable({
                   className="focus-ring h-4 w-4 accent-brand"
                 />
               </th>
-              <SortableHeader column="alder" active={active} hrefForSort={hrefForSort} sort={sort} />
+              <SortableHeader column="alder" active={active} params={params} />
               <th scope="col" className="border-b border-line px-3 py-2.5 font-semibold">Produkt</th>
-              <SortableHeader column="kunde" active={active} hrefForSort={hrefForSort} sort={sort} />
-              <SortableHeader column="pris" active={active} hrefForSort={hrefForSort} sort={sort} />
+              <SortableHeader column="kunde" active={active} params={params} />
+              <SortableHeader column="pris" active={active} params={params} />
               <th scope="col" className="border-b border-line px-3 py-2.5 font-semibold">Byggstatus</th>
               <th scope="col" className="border-b border-line px-3 py-2.5 font-semibold">Faktura</th>
-              <SortableHeader column="byggedato" active={active} hrefForSort={hrefForSort} sort={sort} />
+              <SortableHeader column="byggedato" active={active} params={params} />
             </tr>
           </thead>
           <tbody ref={bodyRef}>
@@ -303,13 +302,11 @@ export function OrderTable({
 function SortableHeader({
   column,
   active,
-  sort,
-  hrefForSort,
+  params,
 }: {
   column: SortKey;
   active: { key: SortKey; desc: boolean };
-  sort?: string;
-  hrefForSort: (value: string) => string;
+  params: Record<string, string | undefined>;
 }) {
   const col = SORT_COLUMNS.find((c) => c.key === column)!;
   const on = active.key === column;
@@ -320,7 +317,7 @@ function SortableHeader({
       className="border-b border-line px-3 py-2.5 font-semibold"
     >
       <Link
-        href={hrefForSort(toggleSort(sort, column))}
+        href={listHref(params, { sort: toggleSort(params.sort, column) })}
         scroll={false}
         className={`focus-ring inline-flex items-center whitespace-nowrap ${on ? 'text-ink' : 'hover:text-ink'}`}
       >

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { applyView, isViewKey, viewCounts } from '@/lib/views';
+import { applyView, isViewKey, listHref, viewCounts, viewHref } from '@/lib/views';
 import type { Order } from '@/lib/types';
 
 function o(p: Partial<Order>): Order {
@@ -37,5 +37,61 @@ describe('views', () => {
     expect(isViewKey('bygge')).toBe(true);
     expect(isViewKey('tull')).toBe(false);
     expect(isViewKey(undefined)).toBe(false);
+  });
+});
+
+describe('viewHref', () => {
+  it('utelater view-parameteren for standardvisningen', () => {
+    expect(viewHref('bygge', {})).toBe('/');
+  });
+
+  it('setter view for de andre visningene', () => {
+    expect(viewHref('fakturere', {})).toBe('/?view=fakturere');
+    expect(viewHref('alle', {})).toBe('/?view=alle');
+  });
+
+  it('tar med aktive filtre, men bytter ut view', () => {
+    const href = viewHref('alle', { q: 'kvam', produkt: 'skjul', view: 'fakturere' });
+    expect(href.startsWith('/?')).toBe(true);
+    const sp = new URLSearchParams(href.slice(2));
+    expect(sp.get('q')).toBe('kvam');
+    expect(sp.get('produkt')).toBe('skjul');
+    expect(sp.get('view')).toBe('alle');
+  });
+
+  it('dropper tomme filterverdier', () => {
+    expect(viewHref('bygge', { q: '', produkt: undefined })).toBe('/');
+  });
+
+  it('beholder ikke valgt ordre når visningen byttes', () => {
+    // Den valgte ordren hører til den forrige lista.
+    expect(viewHref('alle', { valgt: 'abc' })).toBe('/?view=alle');
+  });
+});
+
+describe('listHref', () => {
+  it('slår sammen med gjeldende parametere', () => {
+    const href = listHref({ view: 'fakturere', q: 'kvam' }, { sort: '-pris' });
+    const sp = new URLSearchParams(href.slice(2));
+    expect(sp.get('view')).toBe('fakturere');
+    expect(sp.get('q')).toBe('kvam');
+    expect(sp.get('sort')).toBe('-pris');
+  });
+
+  it('overskriver eksisterende verdi', () => {
+    const href = listHref({ sort: 'alder' }, { sort: '-pris' });
+    expect(new URLSearchParams(href.slice(2)).get('sort')).toBe('-pris');
+  });
+
+  it('fjerner en parameter når den settes til undefined', () => {
+    const href = listHref({ sort: '-pris', valgt: 'abc' }, { valgt: undefined });
+    const sp = new URLSearchParams(href.slice(2));
+    expect(sp.get('sort')).toBe('-pris');
+    expect(sp.has('valgt')).toBe(false);
+  });
+
+  it('gir / når ingenting er satt', () => {
+    expect(listHref({}, {})).toBe('/');
+    expect(listHref({ q: '' }, {})).toBe('/');
   });
 });

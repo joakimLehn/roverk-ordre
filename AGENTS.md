@@ -56,14 +56,44 @@ separat til Vercel). Denne appen:
 
 Snekkerne bruker appen stående, med én hånd, ofte med hansker. Derfor:
 
-- Under `sm` (768 px) rendres ordrelista som kort (`OrderCard`), over som
-  tabell (`OrderTable`). Begge kaller de samme server-handlingene.
-- Trykkflater skal være minst 46 px høye. Nedtrekksmenyer unngås for
+- Brekkpunktet er **`md:` = 768 px**, ikke `sm:`. Tailwind v4 har `sm` på
+  640 px, så alt mellom 640 og 768 (iPad i portrett, delt skjerm) fikk før
+  skrivebordstabellen med 13 px avkryssingsbokser. Bruk `md:` for alt som
+  gater mobil mot skrivebord.
+- Under 768 px rendres ordrelista som kort (`OrderCard`), over som tabell
+  (`OrderTable`). Begge kaller de samme server-handlingene.
+- Trykkflater skal være minst 44 px høye. Nedtrekksmenyer unngås for
   hyppige valg – bruk bunnark (`StatusSheet`) i stedet.
-- Visningene i `src/lib/views.ts` («Å bygge» / «Å fakturere») er mobilens
-  primære navigasjon; det fulle filterpanelet er sammenslått bak `<details>`.
+- Primærnavigasjonen på mobil er `BottomNav` – nederst, i tommelsonen, med
+  tallene fra `viewCounts`. Øvre tredjedel av skjermen rekker ikke tommelen,
+  så ingenting hyppig skal ligge der. `ViewTabs` er skrivebordets variant.
 - Skjemafelt bruker `text-base` på mobil – mindre enn 16 px gjør at iOS
   zoomer inn ved fokus.
+
+## Tilbakemelding og angre
+
+Alt som skriver til databasen fra en liste skal gå gjennom
+`useOptimisticField` (`src/components/useOptimisticField.ts`):
+
+- verdien flytter seg med én gang, serveren bekrefter i bakgrunnen
+- feiler skrivingen faller verdien tilbake av seg selv (`useOptimistic`), og
+  brukeren får en feilmelding – ikke en stille avvist endring
+- hver endring gir en toast med **Angre** i 5 sekunder (`ToastProvider`)
+
+Med hansker, stående, er nabotreff normalt. En endring som ikke bekreftes og
+ikke kan tas tilbake oppdages først når fakturaen mangler.
+
+`StatusSheet` er en `<dialog>` med `showModal()`. Åpen-tilstanden styres av
+React, ikke av dialogens `close`-hendelse: lener man seg på hendelsen kan
+Escape lukke elementet uten at React får vite det, og da sitter brikken død.
+
+## Farger og kontrast
+
+Forgrunnsfargene i `@theme` er satt for å klare WCAG AA (4,5:1) mot sin egen
+bakgrunn – merkene er 11,5 px halvfet, så 3:1-kravet for stor tekst gjelder
+ikke. Endrer du et `--color-*`-par, regn om kontrasten. Bruk aldri `opacity`
+for å tone ned innhold som inneholder tekst; det halverer kontrasten på alt
+samtidig (testordrer bruker stiplet kant og bakgrunnstone i stedet).
 
 ## Regler for endringer
 
@@ -81,6 +111,8 @@ Snekkerne bruker appen stående, med én hånd, ofte med hansker. Derfor:
 
 ## Kjente begrensninger / v2-kandidater
 
+- Tersklene i `src/lib/age.ts` (når en ordre er «gammel» per byggstatus) er
+  satt etter skjønn, ikke etter avtale – bør bekreftes av Joakim
 - Leads-fane (leads-tabellen finnes allerede i samme DB)
 - Admin-UI for allowlist (i dag: `node scripts/add-email.mjs <epost>`)
 - Dynamisk materialberegning fra ordre-config (mål/tilvalg)

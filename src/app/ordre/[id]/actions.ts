@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireUser } from '@/lib/auth';
-import { getOrder, updateOrderBestilling, updateOrderFields } from '@/lib/db';
+import { getOrder, setOrdersInvoiced, updateOrderBestilling, updateOrderFields } from '@/lib/db';
 import { parseBestillingEdit } from '@/lib/edit-order';
 import { isBuildStatus } from '@/lib/status';
 import { normalizeEmail } from '@/lib/email';
@@ -31,6 +31,22 @@ export async function setPaid(id: string, paid: boolean): Promise<void> {
   await requireUser();
   await updateOrderFields(id, { paid_at: paid ? new Date().toISOString() : null });
   done(id);
+}
+
+/**
+ * Marker en bunke ordrer som fakturert (eller angre bunken).
+ *
+ * Én skriving og én revalidering for hele stabelen, i stedet for N av hver.
+ * Returnerer hvor mange rader som faktisk ble endret, så toasten kan si
+ * sannheten når noen av dem alt var fakturert.
+ */
+export async function setInvoicedBulk(ids: string[], invoiced: boolean): Promise<number> {
+  await requireUser();
+  const clean = ids.filter((id) => typeof id === 'string' && id.length > 0).slice(0, 300);
+  const changed = await setOrdersInvoiced(clean, invoiced ? new Date().toISOString() : null);
+  revalidatePath('/');
+  for (const id of clean) revalidatePath(`/ordre/${id}`);
+  return changed;
 }
 
 export async function setTestFlag(id: string, isTest: boolean): Promise<void> {

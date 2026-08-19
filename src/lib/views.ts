@@ -20,6 +20,43 @@ export function applyView(orders: Order[], view: ViewKey): Order[] {
   return orders;
 }
 
+/**
+ * Lenka til en visning, med aktive filtre i behold. Både fanene på skrivebord
+ * og bunnlinja på mobil bruker denne, så de aldri kan drifte fra hverandre.
+ *
+ * `valgt` (ordren som er åpen i sidepanelet) tas bevisst ikke med – den hører
+ * til den lista du forlater.
+ */
+export function viewHref(key: ViewKey, params: Record<string, string | undefined>): string {
+  const sp = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v && k !== 'view' && k !== 'valgt') sp.set(k, v);
+  }
+  if (key !== 'bygge') sp.set('view', key);
+  const q = sp.toString();
+  return q ? `/?${q}` : '/';
+}
+
+/**
+ * Lista med én eller flere parametere endret. Brukes til sortering og til å
+ * peke på ordren som skal stå i sidepanelet – all listetilstand ligger i
+ * URL-en, så den tåler en full sidelast og kan limes til noen andre.
+ *
+ * `undefined` i `patch` fjerner parameteren.
+ */
+export function listHref(
+  params: Record<string, string | undefined>,
+  patch: Record<string, string | undefined>,
+): string {
+  const merged = { ...params, ...patch };
+  const sp = new URLSearchParams();
+  for (const [k, v] of Object.entries(merged)) {
+    if (v) sp.set(k, v);
+  }
+  const q = sp.toString();
+  return q ? `/?${q}` : '/';
+}
+
 export function viewCounts(orders: Order[]): Record<ViewKey, number> {
   return {
     bygge: applyView(orders, 'bygge').length,

@@ -6,7 +6,7 @@ import { createOrder, type NewOrderState } from './actions';
 import { KANALER } from '@/lib/manual-order';
 import { ProductConfigFields } from '@/components/ProductConfigFields';
 
-const input = 'min-h-[46px] w-full rounded-lg border border-line bg-white px-3 py-2 text-base sm:text-sm';
+const input = 'min-h-[46px] w-full rounded-lg border border-line bg-white px-3 py-2 text-base md:text-sm';
 const label = 'block text-xs font-semibold text-muted';
 
 export function NewOrderForm() {
@@ -15,7 +15,7 @@ export function NewOrderForm() {
 
   return (
     <form action={formAction} className="grid max-w-xl gap-3.5">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <label className={label}>
           Produkt *
           <select
@@ -46,7 +46,7 @@ export function NewOrderForm() {
         <input name="name" required className={`${input} mt-1`} />
       </label>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <label className={label}>
           Telefon
           <input name="phone" type="tel" className={`${input} mt-1`} />
@@ -62,7 +62,7 @@ export function NewOrderForm() {
         <input name="address" className={`${input} mt-1`} />
       </label>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <label className={label}>
           Pris (kr)
           <input name="price_nok" inputMode="numeric" placeholder="64 900" className={`${input} mt-1`} />
@@ -83,11 +83,11 @@ export function NewOrderForm() {
       <div className="flex gap-2">
         <button
           disabled={pending}
-          className="min-h-[50px] flex-1 cursor-pointer rounded-xl bg-brand px-4 text-[15px] font-bold text-white disabled:opacity-60 sm:flex-none sm:rounded-lg sm:py-2.5 sm:text-sm sm:font-semibold"
+          className="min-h-[50px] flex-1 cursor-pointer rounded-xl bg-brand px-4 text-[15px] font-bold text-white disabled:opacity-60 md:flex-none md:rounded-lg md:py-2.5 md:text-sm md:font-semibold"
         >
           {pending ? 'Lagrer …' : 'Opprett ordre'}
         </button>
-        <Link href="/" className="flex min-h-[50px] items-center justify-center rounded-xl border border-line bg-white px-5 text-[15px] font-bold sm:min-h-0 sm:rounded-lg sm:py-2.5 sm:text-sm sm:font-semibold">
+        <Link href="/" className="flex min-h-[50px] items-center justify-center rounded-xl border border-line bg-white px-5 text-[15px] font-bold md:min-h-0 md:rounded-lg md:py-2.5 md:text-sm md:font-semibold">
           Avbryt
         </Link>
       </div>

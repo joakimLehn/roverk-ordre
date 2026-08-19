@@ -54,10 +54,19 @@ npm run build      # produksjonsbygg
 ## Mobil
 
 Mobil er primærflaten for snekkerne, så lista rendres som kort under 768 px
-(tabell på skrivebord). Status endres via bunnark med fire store valg,
-fakturert/betalt er avhukinger på kortet, og fanene «Å bygge» / «Å fakturere»
-erstatter filterpanelet for de vanlige tilfellene. Detaljsiden har Ring- og
-Veibeskrivelse-knapper. Alle trykkflater er minst 46 px.
+(Tailwinds `md:` – tabell fra og med 768). Navigasjonen ligger i en bunnlinje
+i tommelsonen med «Å bygge» / «Å fakturere» / «Alle» og tallet over etiketten;
+KPI-rutenettet er derfor bare skrivebord. Byggstatus endres via bunnark med
+fire store valg, og fakturert/betalt er én brikke i tre trinn på kortet.
+«Å bygge» grupperes på byggedato: Forfalt / I dag / Denne uka / Senere /
+Uten byggedato. Detaljsiden har Ring- og Veibeskrivelse-knapper.
+
+Alle endringer er **optimistiske** – brikka flytter seg med én gang, serveren
+bekrefter i bakgrunnen, og hver endring kan angres i 5 sekunder fra toasten.
+Feiler skrivingen faller verdien tilbake og brukeren får beskjed.
+
+Appen har manifest og ikoner, så den kan legges på hjemskjermen og kjøre uten
+Safari-krom.
 
 ## Manuelle ordrer
 
@@ -71,6 +80,11 @@ kan endres direkte fra ordrelista.
 - **Byggstatus** (fri veksling): Ny → Under bygging → Bygd → Montert
 - **Økonomi** (uavhengige avhukinger): Fakturert, Betalt – lagres som tidsstempel
 - **Testordre**: flagg som skjuler ordren fra lister og KPI-tall
+
+Økonomi er fortsatt to uavhengige tidsstempler i basen. Ordrelista *viser* dem
+som ett trinn (`src/lib/money.ts`) fordi det er den rekkefølgen som gjelder i
+praksis; ordredetaljene beholder de to avhukingene, så enhver kombinasjon er
+tilgjengelig.
 
 ## Materialbehov
 
@@ -90,7 +104,8 @@ plukklistene i `roverk as/01-Produkter/*/Kalkyler/`:
 ```
 db/migrations/     idempotente SQL-migreringer mot Neon
 scripts/           migrate.mjs, add-email.mjs (allowlist)
-src/lib/           domenelogikk (status, kpi, format) + db.ts, auth.ts, supabase.ts
+src/lib/           domenelogikk (status, kpi, format, money, age, groups, sort,
+                   views) + db.ts, auth.ts, supabase.ts
 src/data/          materials.ts – statisk materialbehov
 src/components/    UI-komponenter (tabell, badges, skjemaer)
 src/app/           / (liste), /ordre/[id] (detalj), /login

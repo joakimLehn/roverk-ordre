@@ -48,6 +48,32 @@ export async function updateOrderFields(
   );
 }
 
+/**
+ * Marker flere ordrer som fakturert i én skriving.
+ *
+ * Faktureringsrunden er per definisjon en bunke: «montert, ikke fakturert» er
+ * en stabel man går gjennom. Ett kall i stedet for N sparer både rundturer og
+ * N revalideringer av hele lista.
+ *
+ * Ordrer som alt er fakturert røres ikke – tidsstempelet skal ikke flyttes av
+ * at noen tok med hele lista.
+ */
+export async function setOrdersInvoiced(ids: string[], at: string | null): Promise<number> {
+  if (ids.length === 0) return 0;
+  // Ingen cast på id: `orders` eies av nettsiden, så kolonnetypen er ikke vår
+  // å anta. En parameterisert IN-liste virker uansett type – og id-ene er
+  // fortsatt bundne parametere, aldri interpolert tekst.
+  const placeholders = ids.map((_, i) => `$${i + 2}`).join(', ');
+  const rows = (await sql().query(
+    `update orders set invoiced_at = $1
+     where id in (${placeholders})
+       and invoiced_at is ${at === null ? 'not null' : 'null'}
+     returning id`,
+    [at, ...ids],
+  )) as { id: string }[];
+  return rows.length;
+}
+
 export interface NewManualOrder {
   site: string;
   product: string | null;

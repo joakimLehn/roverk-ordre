@@ -44,3 +44,4 @@ in the same pull request — a drifting index is worse than none.
 - `config-edit-values-not-schema.md` — Existing orders may have `config` values edited in place; keys/format must match the website configurators; `site` cannot change
 - `mobile-first-field-ui.md` — Below `sm`, the order list is cards; frequent status changes use `StatusSheet`, not dropdowns; tap targets ≥ 46px; inputs `text-base` on mobile
 - `otp-length-8.md` — Login accepts an 8-digit OTP (and 6–8 digits in validation), not the spec’s 6-digit code
+- `manual-order-inserts.md` — This app may INSERT orders for email/Instagram/phone with `config: { manuell, kanal, registrert_av }`; website orders never have those keys

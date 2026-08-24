@@ -6,7 +6,7 @@ import { toClientFileView } from '@/lib/inspection-file';
 import { formatDateNo } from '@/lib/format';
 import { INSPECTION_PRODUCT_LABELS } from '@/lib/inspection';
 import { Header } from '@/components/Header';
-import { InspectionHistory } from '@/components/InspectionHistory';
+import { InspectionDetail } from '@/components/InspectionDetail';
 import { InspectionDelete } from '@/components/InspectionDelete';
 
 export const dynamic = 'force-dynamic';
@@ -37,8 +37,7 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
             .join(' · ')}
         </p>
 
-        <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted">Historikk</h2>
-        <InspectionHistory inspectionId={inspection.id} files={files} />
+        <InspectionDetail inspection={inspection} files={files} />
         <InspectionDelete inspectionId={inspection.id} name={inspection.name} />
       </main>
     </>

@@ -16,6 +16,7 @@ import {
   kindFromContentType,
   parseInspection,
   parseInspectionEmailExcerpt,
+  parseInspectionSchedule,
   searchInspections,
   validateInspectionFile,
   validateInspectionFileCount,
@@ -151,6 +152,29 @@ describe('parseInspection', () => {
       scheduled_time: '14:30:00',
     });
     expect(r.ok && r.data.scheduled_time).toBe('14:30');
+  });
+});
+
+describe('parseInspectionSchedule', () => {
+  it('godtar dato med klokke, og tømmer begge når dato er tom', () => {
+    const satt = parseInspectionSchedule('2026-08-24', '14:00');
+    expect(satt).toEqual({
+      ok: true,
+      scheduled_on: '2026-08-24',
+      scheduled_time: '14:00',
+    });
+
+    const kuttet = parseInspectionSchedule('2026-08-24', '14:30:00');
+    expect(kuttet.ok && kuttet.scheduled_time).toBe('14:30');
+
+    const tom = parseInspectionSchedule('', '');
+    expect(tom).toEqual({ ok: true, scheduled_on: null, scheduled_time: null });
+  });
+
+  it('avviser klokkeslett uten dato', () => {
+    const r = parseInspectionSchedule('', '10:00');
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.error).toMatch(/dato/i);
   });
 });
 

@@ -104,6 +104,33 @@ const IMAGE_MIME = new Set([
   'image/heif',
 ]);
 
+export type InspectionScheduleParseResult =
+  | { ok: true; scheduled_on: string | null; scheduled_time: string | null }
+  | { ok: false; error: string };
+
+/**
+ * Avtale-feltene alene. Tom dato tømmer også klokkeslett (kalt med tom tid
+ * fra UI). Tid uten dato er ugyldig – vi lagrer ikke klokke alene.
+ */
+export function parseInspectionSchedule(on: string, time: string): InspectionScheduleParseResult {
+  const scheduled_on_raw = on.trim();
+  let scheduled_on: string | null = null;
+  if (scheduled_on_raw) {
+    if (!ISO_DATE_RE.test(scheduled_on_raw)) return { ok: false, error: 'Ugyldig dato.' };
+    scheduled_on = scheduled_on_raw;
+  }
+
+  const scheduled_time_raw = time.trim();
+  let scheduled_time: string | null = null;
+  if (scheduled_time_raw) {
+    if (!TIME_RE.test(scheduled_time_raw)) return { ok: false, error: 'Ugyldig klokkeslett.' };
+    if (!scheduled_on) return { ok: false, error: 'Klokkeslett krever avtalt dato.' };
+    scheduled_time = scheduled_time_raw.slice(0, 5);
+  }
+
+  return { ok: true, scheduled_on, scheduled_time };
+}
+
 export function parseInspection(f: Record<string, string>): InspectionParseResult {
   const name = (f.name ?? '').trim();
   if (!name) return { ok: false, error: 'Kundenavn er påkrevd.' };
@@ -112,20 +139,9 @@ export function parseInspection(f: Record<string, string>): InspectionParseResul
   const email = emailRaw ? normalizeEmail(emailRaw) : null;
   if (emailRaw && !email) return { ok: false, error: 'Ugyldig e-postadresse.' };
 
-  const scheduled_on_raw = (f.scheduled_on ?? '').trim();
-  let scheduled_on: string | null = null;
-  if (scheduled_on_raw) {
-    if (!ISO_DATE_RE.test(scheduled_on_raw)) return { ok: false, error: 'Ugyldig dato.' };
-    scheduled_on = scheduled_on_raw;
-  }
-
-  const scheduled_time_raw = (f.scheduled_time ?? '').trim();
-  let scheduled_time: string | null = null;
-  if (scheduled_time_raw) {
-    if (!TIME_RE.test(scheduled_time_raw)) return { ok: false, error: 'Ugyldig klokkeslett.' };
-    if (!scheduled_on) return { ok: false, error: 'Klokkeslett krever avtalt dato.' };
-    scheduled_time = scheduled_time_raw.slice(0, 5);
-  }
+  const schedule = parseInspectionSchedule(f.scheduled_on ?? '', f.scheduled_time ?? '');
+  if (!schedule.ok) return schedule;
+  const { scheduled_on, scheduled_time } = schedule;
 
   const productRaw = (f.product ?? '').trim();
   if (productRaw && !isInspectionProduct(productRaw)) {

@@ -11,10 +11,14 @@ import {
   getInspectionFile,
   insertInspectionFile,
   listInspectionFiles,
+  updateInspectionFields,
 } from '@/lib/db';
 import { deleteInspectionBlob, deleteInspectionBlobs } from '@/lib/inspection-blob';
 import {
+  parseInspection,
   parseInspectionEmailExcerpt,
+  parseInspectionSchedule,
+  isInspectionStatus,
   validateInspectionFile,
   validateInspectionFileCount,
 } from '@/lib/inspection';
@@ -122,4 +126,58 @@ export async function removeInspection(id: string): Promise<void> {
   });
   revalidatePath('/befaringer');
   redirect('/befaringer');
+}
+
+export async function setInspectionStatus(id: string, status: string): Promise<void> {
+  await requireUser();
+  if (!isInspectionStatus(status)) throw new Error('Ukjent status');
+  await updateInspectionFields(id, { status });
+  done(id);
+}
+
+export async function setInspectionSchedule(
+  id: string,
+  on: string,
+  time: string,
+): Promise<{ message?: string }> {
+  await requireUser();
+  const parsed = parseInspectionSchedule(on, time);
+  if (!parsed.ok) return { message: parsed.error };
+  await updateInspectionFields(id, {
+    scheduled_on: parsed.scheduled_on,
+    scheduled_time: parsed.scheduled_time,
+  });
+  done(id);
+  return {};
+}
+
+export async function saveInspectionCustomer(
+  id: string,
+  formData: FormData,
+): Promise<{ message?: string }> {
+  await requireUser();
+  const fields: Record<string, string> = {};
+  for (const [key, value] of formData.entries()) {
+    if (typeof value === 'string') fields[key] = value;
+  }
+  const parsed = parseInspection(fields);
+  if (!parsed.ok) return { message: parsed.error };
+  // Bare kundekolonner – parseInspection default'er status/avtale når de
+  // ikke er i skjemaet, og de skal ikke overskrives her.
+  await updateInspectionFields(id, {
+    name: parsed.data.name,
+    phone: parsed.data.phone,
+    email: parsed.data.email,
+    address: parsed.data.address,
+    product: parsed.data.product,
+    channel: parsed.data.channel,
+  });
+  done(id);
+  return {};
+}
+
+export async function saveInspectionNotes(id: string, notes: string): Promise<void> {
+  await requireUser();
+  await updateInspectionFields(id, { notes: notes.slice(0, 10_000) || null });
+  done(id);
 }

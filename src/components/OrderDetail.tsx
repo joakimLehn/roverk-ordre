@@ -71,7 +71,7 @@ export function OrderDetail({ order, compact = false }: { order: Order; compact?
 
   return (
     <>
-      <ContactActions order={order} />
+      <ContactActions phone={order.phone} address={order.address} />
 
       <Section title="Byggstatus">
         <StatusButtons orderId={order.id} kunde={order.name} current={order.build_status} />

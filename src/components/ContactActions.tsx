@@ -1,10 +1,11 @@
-import type { Order } from '@/lib/types';
-
 // Ring og veibeskrivelse som knapper – på mobil er dette de to handlingene
-// snekkeren faktisk trenger fra en ordre.
+// snekkeren faktisk trenger fra en ordre eller befaring.
 //
 // Ikonene er inline SVG, ikke emoji: 📞 og 🧭 rendres ulikt per plattform, og
 // skjermlesere leser opp emojinavnet midt i knappeteksten.
+//
+// Props er { phone, address } – ikke Order – så befaring kan bruke samme
+// knapper uten å arve ordreskjemaet.
 
 function PhoneIcon() {
   return (
@@ -33,20 +34,20 @@ function CompassIcon() {
   );
 }
 
-export function ContactActions({ order }: { order: Order }) {
-  const mapUrl = order.address
-    ? `https://maps.google.com/?q=${encodeURIComponent(order.address)}`
+export function ContactActions({ phone, address }: { phone: string | null; address: string | null }) {
+  const mapUrl = address
+    ? `https://maps.google.com/?q=${encodeURIComponent(address)}`
     : null;
 
-  if (!order.phone && !mapUrl) return null;
+  if (!phone && !mapUrl) return null;
 
   const btn =
     'focus-ring flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-xl border border-line bg-white text-sm font-bold text-ink';
 
   return (
     <div className="mb-5 flex gap-2">
-      {order.phone ? (
-        <a href={`tel:${order.phone.replace(/\s/g, '')}`} className={btn}>
+      {phone ? (
+        <a href={`tel:${phone.replace(/\s/g, '')}`} className={btn}>
           <PhoneIcon /> Ring
         </a>
       ) : null}

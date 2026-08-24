@@ -1,6 +1,7 @@
 import 'server-only';
 import { neon } from '@neondatabase/serverless';
 import type { Order } from './types';
+import type { InspectionInput } from './inspection';
 import { normalizeOrder } from './normalize';
 
 let _sql: ReturnType<typeof neon> | null = null;
@@ -104,6 +105,19 @@ export async function insertManualOrder(o: NewManualOrder): Promise<string> {
      returning id`,
     [o.site, o.product, JSON.stringify(o.config), o.name, o.phone, o.email,
      o.address, o.price_nok, o.preferred_date, o.internal_notes],
+  )) as { id: string }[];
+  return rows[0].id;
+}
+
+export async function insertInspection(
+  o: InspectionInput & { created_by: string },
+): Promise<string> {
+  const rows = (await sql().query(
+    `insert into inspections (created_by, name, phone, email, address, scheduled_on, scheduled_time, product, channel, notes)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+     returning id`,
+    [o.created_by, o.name, o.phone, o.email, o.address,
+     o.scheduled_on, o.scheduled_time, o.product, o.channel, o.notes],
   )) as { id: string }[];
   return rows[0].id;
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeOrder, toDateString, toIsoString } from '@/lib/normalize';
+import { normalizeOrder, toDateString, toIsoString, toTimeString } from '@/lib/normalize';
 
 describe('normalize', () => {
   it('gjør Date om til ISO-streng for tidsstempler', () => {
@@ -13,6 +13,11 @@ describe('normalize', () => {
     expect(toDateString('2026-08-22')).toBe('2026-08-22');
     expect(toDateString('2026-08-22T00:00:00.000Z')).toBe('2026-08-22');
     expect(toDateString(null)).toBeNull();
+  });
+  it('kutter Postgres-time til HH:MM', () => {
+    expect(toTimeString('14:00:00')).toBe('14:00');
+    expect(toTimeString('09:05:12.123')).toBe('09:05');
+    expect(toTimeString(null)).toBeNull();
   });
   it('normaliserer en hel ordre-rad', () => {
     const o = normalizeOrder({

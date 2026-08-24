@@ -26,6 +26,8 @@ separat til Vercel). Denne appen:
   `build_status`, `invoiced_at`, `paid_at`, `is_test`, `planned_build_date`,
   `internal_notes` – pluss kundefeltene (`name`, `phone`, `email`, `address`,
   `preferred_date`) ved eksplisitt redigering
+- eier tabellene den selv oppretter: `allowed_emails`, `inspections` og
+  `inspection_files`. Full CRUD der. Nettsidens kolonner røres ikke.
 - må ALDRI endre semantikken til nettsidens kolonner (`status`, `config`,
   `utm`, `notify`, `address_meta`) – nettsiden er avsender, vi er mottaker
 - alle migreringer skal være idempotente (`add column if not exists`) og
@@ -37,11 +39,18 @@ separat til Vercel). Denne appen:
   under `@theme` – Roverk-oransje er `--color-brand: #DE7214`)
 - **All datatilgang server-side**: Server Components leser, Server Actions
   skriver. Ingen DB-nøkler eller Supabase service-nøkler i klienten.
+- **Filer**: `@vercel/blob`, **kun** befaringsvedlegg (bilder/PDF). Metadata og
+  e-postutdrag ligger i Neon. Ingen forretningsdata i Supabase Storage.
+  Klienten laster direkte til Blob (`handleUpload`) fordi Vercel serverless
+  har ~4,5 MB request-body – telefonbilder er ofte større. Lesing går via
+  autentisert rute som redirecter til signert URL; bytene strømmes ikke
+  gjennom Serverless. Uten `BLOB_READ_WRITE_TOKEN` bygger appen og viser
+  metadata; opplasting feiler med synlig norsk melding.
 - **DB**: `@neondatabase/serverless` via `src/lib/db.ts`. Ikke ORM.
   Kolonnenavn i `updateOrderFields` kommer fra en typed whitelist –
   aldri interpolér brukerinput i SQL.
 - **Auth**: Supabase e-post-OTP (`@supabase/ssr`). Supabase brukes KUN til
-  auth – aldri lagre forretningsdata der. Flyt:
+  auth – aldri lagre forretningsdata der (heller ikke Storage). Flyt:
   1. `/login`: e-post sjekkes mot `allowed_emails` i Neon FØR kode sendes
      (svaret er likt uansett, så vi ikke lekker hvem som har tilgang)
   2. `middleware.ts` session-gater alle ruter unntatt `/login`
@@ -106,6 +115,9 @@ samtidig (testordrer bruker stiplet kant og bakgrunnstone i stedet).
   av Joakim mot kalkylene.
 - **Norsk språk** i all UI-tekst og alle commit-nære kommentarer.
 - **Ingen nye avhengigheter** uten god grunn – appen er bevisst liten.
+  Unntaket er `@vercel/blob`: Server Action-opplasting treffer Vercels
+  4,5 MB body-grense, og Supabase Storage er forbudt (kun auth). Se
+  `context/vercel-blob-inspection-files.md`.
 - Verifiser med `npx tsc --noEmit && npm test && npm run build` før du
   melder noe som ferdig.
 
@@ -123,5 +135,7 @@ samtidig (testordrer bruker stiplet kant og bakgrunnstone i stedet).
 ## Miljø
 
 Env-variabler i `.env.local` (se `.env.example`): `DATABASE_URL` (Neon, delt
-med nettsiden), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-Uten disse bygger appen, men kjører ikke.
+med nettsiden), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+`BLOB_READ_WRITE_TOKEN` (Vercel Blob, kun befaringsvedlegg).
+Uten de tre første bygger appen, men kjører ikke. Uten Blob-token bygger
+appen og viser vedleggsmetadata; opplasting feiler synlig.

@@ -78,7 +78,8 @@ export function isInspectionViewKey(v: unknown): v is InspectionViewKey {
 }
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+/** HTML time kan sende HH:MM eller HH:MM:SS. Vi lagrer HH:MM. */
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
 
 export const INSPECTION_ALLOWED_MIME = [
   'image/jpeg',
@@ -123,7 +124,7 @@ export function parseInspection(f: Record<string, string>): InspectionParseResul
   if (scheduled_time_raw) {
     if (!TIME_RE.test(scheduled_time_raw)) return { ok: false, error: 'Ugyldig klokkeslett.' };
     if (!scheduled_on) return { ok: false, error: 'Klokkeslett krever avtalt dato.' };
-    scheduled_time = scheduled_time_raw;
+    scheduled_time = scheduled_time_raw.slice(0, 5);
   }
 
   const productRaw = (f.product ?? '').trim();
@@ -132,7 +133,7 @@ export function parseInspection(f: Record<string, string>): InspectionParseResul
   }
   const product = productRaw ? (productRaw as InspectionProduct) : null;
 
-  const channelRaw = (f.channel ?? '').trim();
+  const channelRaw = (f.kanal || f.channel || '').trim();
   if (channelRaw && !(KANALER as readonly string[]).includes(channelRaw)) {
     return { ok: false, error: 'Ukjent kanal.' };
   }

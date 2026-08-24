@@ -137,6 +137,21 @@ describe('parseInspection', () => {
     expect(r.ok && r.data.product).toBe('annet');
     expect(r.ok && r.data.channel).toBe('Annet');
   });
+
+  it('leser skjemafeltet kanal likt som channel', () => {
+    const r = parseInspection({ name: 'Per', kanal: 'Telefon' });
+    expect(r.ok && r.data.channel).toBe('Telefon');
+    expect(parseInspection({ name: 'Per', kanal: 'Brevdue' }).ok).toBe(false);
+  });
+
+  it('lagrer HTML-klokkeslett med sekunder som HH:MM', () => {
+    const r = parseInspection({
+      name: 'Per',
+      scheduled_on: '2026-08-24',
+      scheduled_time: '14:30:00',
+    });
+    expect(r.ok && r.data.scheduled_time).toBe('14:30');
+  });
 });
 
 describe('visning og søk', () => {

@@ -2,23 +2,23 @@
 
 ## Decision
 
-`/befaringer/ny` eier `parseInspection`, `insertInspection` og migrering `003-inspections.sql` i samme endring som skjemaet. `createInspection` kaller dem; den skriver aldri til `orders`.
+Superseded by `context/inspection-parse-kanal-and-seconds.md`. Etter at #11/#12/#18 lander på `feature/10-befaringer`, eier domenemodulen parse, insert og migrering. Ny-skjemaet er UI + action mot de funksjonene.
 
 ## Rejected
 
-Å vente på at domenemodell- og datalag-sakene (#11, #12) merges først: `createInspection` kan da ikke kompilere eller persistere, og akseptansen («rad i inspections») blir umulig å innfri på `feature/10-befaringer`. Å stubbe parse/insert, eller å legge befaringen inn i `orders` med et flagg.
+See replacement.
 
 ## Reason
 
-Basen har bare specen. Skjemaet speiler `/ordre/ny`, der parse og insert ligger i samme flyt som UI-et. Ukjent produkt/kanal avvises her (ikke gjettes til «annet»), fordi det er kontrakten create-actionen faktisk kjører.
+See replacement.
 
 ## Status
 
-stated
+superseded by `context/inspection-parse-kanal-and-seconds.md`
 
 ## Evidence
 
-`src/lib/inspection.ts` (`parseInspection`), `insertInspection` i `src/lib/db.ts`, `src/app/befaringer/ny/actions.ts`
+`src/lib/inspection.ts`, `src/lib/db.ts`, `db/migrations/003-inspections.sql`
 
 ## Source
 
@@ -26,4 +26,4 @@ https://github.com/joakimLehn/roverk-ordre/issues/14
 
 ## Revisit when
 
-#11 og #12 er merget og eier parse/tabell/insert; da skal denne PRen bare være UI + action mot de funksjonene.
+Do not; the replacement is in force.

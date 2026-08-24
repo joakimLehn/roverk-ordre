@@ -24,7 +24,19 @@ export async function createInspection(
   const parsed = parseInspection(fields);
   if (!parsed.ok) return { message: parsed.error };
 
-  const id = await insertInspection({ ...parsed.data, created_by: email });
+  const id = await insertInspection({
+    name: parsed.data.name,
+    phone: parsed.data.phone,
+    email: parsed.data.email,
+    address: parsed.data.address,
+    scheduled_on: parsed.data.scheduled_on,
+    scheduled_time: parsed.data.scheduled_time,
+    status: parsed.data.status,
+    product: parsed.data.product,
+    channel: parsed.data.channel,
+    notes: parsed.data.notes,
+    created_by: email,
+  });
 
   revalidatePath('/befaringer');
   redirect(`/befaringer/${id}`);

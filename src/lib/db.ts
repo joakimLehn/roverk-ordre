@@ -1,7 +1,9 @@
 import 'server-only';
 import { neon } from '@neondatabase/serverless';
+import type { Inspection } from './inspection';
+import type { InspectionFile, InspectionFileKind } from './inspection-file';
+import { normalizeInspection, normalizeInspectionFile, normalizeOrder } from './normalize';
 import type { Order } from './types';
-import { normalizeOrder } from './normalize';
 
 let _sql: ReturnType<typeof neon> | null = null;
 function sql() {
@@ -114,4 +116,136 @@ export async function isEmailAllowed(email: string): Promise<boolean> {
     [email],
   )) as unknown[];
   return rows.length > 0;
+}
+
+const INSPECTION_COLS = `id, created_at, created_by, name, phone, email, address,
+  scheduled_on, scheduled_time, status, product, channel, notes, updated_at`;
+
+const INSPECTION_FILE_COUNT = `(select count(*)::int from inspection_files f where f.inspection_id = inspections.id) as file_count`;
+
+const INSPECTION_FILE_COLS = `id, inspection_id, created_at, created_by, kind, filename,
+  content_type, byte_size, blob_pathname, subject, body_text`;
+
+export async function listInspections(): Promise<Inspection[]> {
+  const rows = (await sql().query(
+    `select ${INSPECTION_COLS}, ${INSPECTION_FILE_COUNT}
+     from inspections
+     order by created_at desc`,
+  )) as Record<string, unknown>[];
+  return rows.map(normalizeInspection);
+}
+
+export async function getInspection(id: string): Promise<Inspection | null> {
+  const rows = (await sql().query(
+    `select ${INSPECTION_COLS}, ${INSPECTION_FILE_COUNT}
+     from inspections where id = $1`,
+    [id],
+  )) as Record<string, unknown>[];
+  return rows[0] ? normalizeInspection(rows[0]) : null;
+}
+
+export interface NewInspection {
+  name: string;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  scheduled_on: string | null;
+  scheduled_time: string | null;
+  status?: Inspection['status'];
+  product: Inspection['product'];
+  channel: string | null;
+  notes: string | null;
+  created_by: string | null;
+}
+
+export async function insertInspection(data: NewInspection): Promise<string> {
+  const rows = (await sql().query(
+    `insert into inspections
+       (name, phone, email, address, scheduled_on, scheduled_time, status, product, channel, notes, created_by)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+     returning id`,
+    [
+      data.name, data.phone, data.email, data.address, data.scheduled_on, data.scheduled_time,
+      data.status ?? 'aktiv', data.product, data.channel, data.notes, data.created_by,
+    ],
+  )) as { id: string }[];
+  return rows[0].id;
+}
+
+type InspectionEditableField =
+  | 'name' | 'phone' | 'email' | 'address'
+  | 'scheduled_on' | 'scheduled_time' | 'status' | 'product' | 'channel' | 'notes';
+
+export async function updateInspectionFields(
+  id: string,
+  fields: Partial<Pick<Inspection, InspectionEditableField>>,
+): Promise<void> {
+  const keys = Object.keys(fields) as InspectionEditableField[];
+  if (keys.length === 0) return;
+  const sets = keys.map((k, i) => `${k} = $${i + 2}`).join(', ');
+  await sql().query(
+    `update inspections set ${sets}, updated_at = now() where id = $1`,
+    [id, ...keys.map((k) => fields[k] ?? null)],
+  );
+}
+
+export async function deleteInspection(id: string): Promise<void> {
+  await sql().query('delete from inspections where id = $1', [id]);
+}
+
+export async function listInspectionFiles(inspectionId: string): Promise<InspectionFile[]> {
+  const rows = (await sql().query(
+    `select ${INSPECTION_FILE_COLS}
+     from inspection_files
+     where inspection_id = $1
+     order by created_at asc`,
+    [inspectionId],
+  )) as Record<string, unknown>[];
+  return rows.map(normalizeInspectionFile);
+}
+
+export async function getInspectionFile(id: string): Promise<InspectionFile | null> {
+  const rows = (await sql().query(
+    `select ${INSPECTION_FILE_COLS} from inspection_files where id = $1`,
+    [id],
+  )) as Record<string, unknown>[];
+  return rows[0] ? normalizeInspectionFile(rows[0]) : null;
+}
+
+export async function countInspectionFiles(inspectionId: string): Promise<number> {
+  const rows = (await sql().query(
+    'select count(*)::int as n from inspection_files where inspection_id = $1',
+    [inspectionId],
+  )) as { n: number }[];
+  return Number(rows[0]?.n ?? 0);
+}
+
+export interface NewInspectionFile {
+  inspection_id: string;
+  created_by: string | null;
+  kind: InspectionFileKind;
+  filename: string;
+  content_type: string | null;
+  byte_size: number | null;
+  blob_pathname: string | null;
+  subject: string | null;
+  body_text: string | null;
+}
+
+export async function insertInspectionFile(data: NewInspectionFile): Promise<string> {
+  const rows = (await sql().query(
+    `insert into inspection_files
+       (inspection_id, created_by, kind, filename, content_type, byte_size, blob_pathname, subject, body_text)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+     returning id`,
+    [
+      data.inspection_id, data.created_by, data.kind, data.filename, data.content_type,
+      data.byte_size, data.blob_pathname, data.subject, data.body_text,
+    ],
+  )) as { id: string }[];
+  return rows[0].id;
+}
+
+export async function deleteInspectionFile(id: string): Promise<void> {
+  await sql().query('delete from inspection_files where id = $1', [id]);
 }

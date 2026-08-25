@@ -1,5 +1,16 @@
 import { KANALER } from './manual-order';
 import { normalizeEmail } from './email';
+import {
+  validateUploadFile,
+  validateUploadFileCount,
+} from './upload';
+
+export {
+  ALLOWED_UPLOAD_MIME as INSPECTION_ALLOWED_MIME,
+  MAX_FILE_BYTES as INSPECTION_MAX_FILE_BYTES,
+  MAX_FILES as INSPECTION_MAX_FILES,
+  kindFromContentType,
+} from './upload';
 
 export type InspectionStatus = 'aktiv' | 'gjennomfort' | 'avlyst';
 export type InspectionProduct = 'skjul' | 'ved' | 'orden' | 'annet';
@@ -94,28 +105,7 @@ const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 /** HTML time kan sende HH:MM eller HH:MM:SS. Vi lagrer HH:MM. */
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
 
-export const INSPECTION_ALLOWED_MIME = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-  'image/heic',
-  'image/heif',
-  'application/pdf',
-] as const;
-
-export const INSPECTION_MAX_FILE_BYTES = 15 * 1024 * 1024;
-export const INSPECTION_MAX_FILES = 40;
 export const INSPECTION_MAX_EMAIL_CHARS = 50_000;
-
-const IMAGE_MIME = new Set([
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-  'image/heic',
-  'image/heif',
-]);
 
 export type InspectionScheduleParseResult =
   | { ok: true; scheduled_on: string | null; scheduled_time: string | null }
@@ -250,36 +240,18 @@ export function formatInspectionWhen(
   return `${label}${clock}`;
 }
 
-export function kindFromContentType(contentType: string): Exclude<InspectionFileKind, 'epost'> | null {
-  const mime = contentType.trim().toLowerCase().split(';')[0] ?? '';
-  if (mime === 'application/pdf') return 'pdf';
-  if (IMAGE_MIME.has(mime)) return 'bilde';
-  return null;
-}
-
 export function validateInspectionFile(input: {
   contentType: string;
   byteSize: number;
 }): { ok: true; kind: 'bilde' | 'pdf' } | { ok: false; error: string } {
-  const kind = kindFromContentType(input.contentType);
-  if (!kind) return { ok: false, error: 'Filtypen er ikke tillatt.' };
-  if (!Number.isFinite(input.byteSize) || input.byteSize < 0) {
-    return { ok: false, error: 'Ugyldig filstørrelse.' };
-  }
-  if (input.byteSize > INSPECTION_MAX_FILE_BYTES) {
-    return { ok: false, error: 'Filen er for stor. Maks 15 MB.' };
-  }
-  return { ok: true, kind };
+  return validateUploadFile(input);
 }
 
 export function validateInspectionFileCount(
   current: number,
   adding: number,
 ): { ok: true } | { ok: false; error: string } {
-  if (current + adding > INSPECTION_MAX_FILES) {
-    return { ok: false, error: 'For mange filer. Maks 40 per befaring.' };
-  }
-  return { ok: true };
+  return validateUploadFileCount(current, adding, 'befaring');
 }
 
 export interface InspectionEmailExcerpt {

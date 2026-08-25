@@ -2,10 +2,25 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireUser } from '@/lib/auth';
-import { getOrder, setOrdersInvoiced, updateOrderBestilling, updateOrderFields } from '@/lib/db';
+import {
+  countOrderFiles,
+  deleteOrderFile,
+  getOrder,
+  getOrderFile,
+  insertOrderFile,
+  setOrdersInvoiced,
+  updateOrderBestilling,
+  updateOrderFields,
+} from '@/lib/db';
+import { deleteInspectionBlob } from '@/lib/inspection-blob';
 import { parseBestillingEdit } from '@/lib/edit-order';
+import {
+  orderFileDisplayName,
+  validateOrderFileInsert,
+} from '@/lib/order-file';
 import { isBuildStatus } from '@/lib/status';
 import { normalizeEmail } from '@/lib/email';
+import { deleteBlobThenRecord } from '@/lib/upload';
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -110,4 +125,50 @@ export async function saveCustomer(id: string, formData: FormData): Promise<void
     preferred_date: ISO_DATE_RE.test(pd) ? pd : null,
   });
   done(id);
+}
+
+export async function saveOrderFile(input: {
+  orderId: string;
+  pathname: string;
+  filename: string;
+  contentType: string;
+  byteSize: number;
+}): Promise<void> {
+  const { email } = await requireUser();
+  const order = await getOrder(input.orderId);
+  if (!order) throw new Error('Fant ikke ordren.');
+
+  const count = await countOrderFiles(input.orderId);
+  const parsed = validateOrderFileInsert({
+    orderId: input.orderId,
+    pathname: input.pathname,
+    contentType: input.contentType,
+    byteSize: input.byteSize,
+    currentFileCount: count,
+  });
+  if (!parsed.ok) throw new Error(parsed.error);
+
+  await insertOrderFile({
+    order_id: input.orderId,
+    created_by: email,
+    kind: parsed.kind,
+    filename: orderFileDisplayName(input.filename),
+    content_type: input.contentType,
+    byte_size: input.byteSize,
+    blob_pathname: input.pathname,
+  });
+  done(input.orderId);
+}
+
+export async function removeOrderFile(orderId: string, fileId: string): Promise<void> {
+  await requireUser();
+  const file = await getOrderFile(fileId);
+  if (!file || file.order_id !== orderId) throw new Error('Fant ikke vedlegget.');
+
+  await deleteBlobThenRecord({
+    blobPathname: file.blob_pathname,
+    deleteBlob: deleteInspectionBlob,
+    deleteRecord: () => deleteOrderFile(fileId),
+  });
+  done(orderId);
 }

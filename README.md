@@ -38,6 +38,8 @@ Vercel Blob = kun befaringsvedlegg (private bilder/PDF-er)
    ```bash
    npm run db:migrate
    ```
+   Etter oppsettet trenger du sjelden dette – migreringer som lander på `main`
+   kjøres av GitHub Action-en, se [Migreringer](#migreringer).
 4. **Legg til ansatte på allowlisten**:
    ```bash
    node --env-file=.env.local scripts/add-email.mjs ola@snekker.no
@@ -87,6 +89,23 @@ Bestillinger som kommer via e-post, Instagram eller telefon legges inn med
 hvem som registrerte ordren lagres i `config`. Byggstatus og fakturert/betalt
 kan endres direkte fra ordrelista.
 
+## Migreringer
+
+SQL-en ligger i `db/migrations/`, én fil per endring, kjørt i filnavnrekkefølge.
+`scripts/migrate.mjs` fører hver fil i tabellen `schema_migrations` (filnavn +
+sjekksum), så en fil som alt er kjørt hoppes over. Endrer du en fil som er
+kjørt, stopper skriptet – legg endringen i en ny fil i stedet.
+
+Lander en migrering på `main`, kjører GitHub Action-en
+`.github/workflows/migrer-database.yml` den mot prod-basen. Den leser
+`DATABASE_URL` fra repo-secrets. Lokalt kjører du `npm run db:migrate`.
+
+Skriptet printer alltid hvilket endepunkt det snakker med, og avbryter hvis
+basen ikke har nettsidens `orders`-tabell. Det er verdt å vite at
+`node --env-file` **ikke** overskriver variabler som allerede finnes i miljøet:
+har du `DATABASE_URL` eksportert i shellet, ignoreres `.env.local` stille.
+Skriptet oppdager det og ber deg kjøre `env -u DATABASE_URL npm run db:migrate`.
+
 ## Statusmodell
 
 - **Byggstatus** (fri veksling): Ny → Under bygging → Bygd → Montert
@@ -114,7 +133,7 @@ plukklistene i `roverk as/01-Produkter/*/Kalkyler/`:
 ## Struktur
 
 ```
-db/migrations/     idempotente SQL-migreringer mot Neon
+db/migrations/     idempotente SQL-migreringer mot Neon (føres i schema_migrations)
 scripts/           migrate.mjs, add-email.mjs (allowlist)
 src/lib/           domenelogikk (status, kpi, format, money, age, groups, sort,
                    views, inspection, inspection-file) + db.ts, auth.ts, supabase.ts

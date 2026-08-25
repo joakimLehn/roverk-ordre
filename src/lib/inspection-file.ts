@@ -1,6 +1,7 @@
 import type { InspectionFileKind } from './inspection';
 
 export type { InspectionFileKind };
+export { deleteBlobThenRecord, isRenderableImage } from './upload';
 
 export interface InspectionFile {
   id: string;
@@ -22,7 +23,6 @@ export type InspectionFileView = Omit<InspectionFile, 'blob_pathname'>;
 export type ParseResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const RENDERABLE_IMAGE = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
 export function isInspectionId(id: string): boolean {
   return UUID_RE.test(id);
@@ -51,15 +51,6 @@ export function toClientFileView(file: InspectionFile): InspectionFileView {
   };
 }
 
-export function isRenderableImage(contentType: string | null | undefined, filename?: string): boolean {
-  const type = (contentType ?? '').split(';')[0].trim().toLowerCase();
-  if (RENDERABLE_IMAGE.has(type)) return true;
-  if (type === 'image/heic' || type === 'image/heif') return false;
-  const name = (filename ?? '').toLowerCase();
-  if (name.endsWith('.heic') || name.endsWith('.heif')) return false;
-  return false;
-}
-
 export function isInspectionBlobPath(inspectionId: string, pathname: string): boolean {
   if (!isInspectionId(inspectionId)) return false;
   const prefix = inspectionBlobPrefix(inspectionId);
@@ -83,25 +74,6 @@ export function parseInspectionUploadRequest(
     return { ok: false, error: 'Ugyldig filsti.' };
   }
   return { ok: true, data: { inspectionId } };
-}
-
-/**
- * Slett Blob først, deretter DB-raden. Feilet blob-slett skal ikke stoppe
- * rad-slett – en orphan blob er bedre enn en rad som peker på noe som er borte.
- */
-export async function deleteBlobThenRecord(opts: {
-  blobPathname: string | null;
-  deleteBlob: (pathname: string) => Promise<void>;
-  deleteRecord: () => Promise<void>;
-}): Promise<void> {
-  if (opts.blobPathname) {
-    try {
-      await opts.deleteBlob(opts.blobPathname);
-    } catch {
-      // best-effort
-    }
-  }
-  await opts.deleteRecord();
 }
 
 /**

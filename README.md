@@ -14,7 +14,7 @@ roverk.no (nettsiden)  ──skriver──>  Neon Postgres (orders-tabellen)
                                           ▲
 ordre.roverk.no (denne appen) ──leser/oppdaterer──┘
 Supabase  = kun innlogging (e-post-OTP)
-Vercel Blob = kun befaringsvedlegg (private bilder/PDF-er)
+Vercel Blob = befarings- og ordrevedlegg (private bilder/PDF-er)
 ```
 
 - Nettsiden (`roverk as/03-Nettsider`) skriver nye ordrer til `orders` i Neon.
@@ -23,7 +23,7 @@ Vercel Blob = kun befaringsvedlegg (private bilder/PDF-er)
   `internal_notes`) – nettsidens kolonner røres aldri.
 - Appen eier `allowed_emails`, `inspections`, `inspection_files` og `order_files`.
 - Supabase brukes **kun** til autentisering. All forretningsdata ligger i Neon
-  (pluss Vercel Blob for befaringsbilder/PDF, aldri i Supabase Storage).
+  (pluss Vercel Blob for befarings- og ordrebilder/PDF, aldri i Supabase Storage).
 
 ## Oppsett (engangsjobb)
 
@@ -46,12 +46,12 @@ Vercel Blob = kun befaringsvedlegg (private bilder/PDF-er)
    ```
 5. **Vercel**: nytt prosjekt av dette repoet, sett de fire env-variablene,
    legg til domenet `ordre.roverk.no`.
-6. **Vercel Blob** (befaringsvedlegg): Joakim oppretter en **privat** Blob-store
+6. **Vercel Blob** (befarings- og ordrevedlegg): Joakim oppretter en **privat** Blob-store
    på prosjektet som deployer `ordre.roverk.no`, og setter
    `BLOB_READ_WRITE_TOKEN` på preview og production (og Development for lokal
    `vercel env pull`). Uten token bygger appen og viser vedleggsmetadata;
    opplasting feiler med en synlig norsk melding. Tokenet brukes ikke til
-   annet enn befaringsfiler.
+   annet enn befarings- og ordrefiler.
 
 ## Utvikling
 
@@ -136,12 +136,13 @@ plukklistene i `roverk as/01-Produkter/*/Kalkyler/`:
 db/migrations/     idempotente SQL-migreringer mot Neon (føres i schema_migrations)
 scripts/           migrate.mjs, add-email.mjs (allowlist)
 src/lib/           domenelogikk (status, kpi, format, money, age, groups, sort,
-                   views, inspection, inspection-file) + db.ts, auth.ts, supabase.ts
+                   views, inspection, inspection-file, order-file, upload)
+                   + db.ts, auth.ts, supabase.ts
 src/data/          materials.ts – statisk materialbehov
 src/components/    UI-komponenter (tabell, badges, skjemaer)
 src/app/           / (ordreliste), /ordre/[id], /ordre/ny,
                    /befaringer (liste), /befaringer/[id], /befaringer/ny,
-                   /api/befaringer/upload, /login
+                   /api/befaringer/upload, /api/ordre/upload, /login
 docs/superpowers/  design-spec og implementasjonsplan
 ```
 

@@ -42,13 +42,14 @@ separat til Vercel). Denne appen:
   under `@theme` – Roverk-oransje er `--color-brand: #DE7214`)
 - **All datatilgang server-side**: Server Components leser, Server Actions
   skriver. Ingen DB-nøkler eller Supabase service-nøkler i klienten.
-- **Filer**: `@vercel/blob`, **kun** befaringsvedlegg (bilder/PDF). Metadata og
-  e-postutdrag ligger i Neon. Ingen forretningsdata i Supabase Storage.
-  Klienten laster direkte til Blob (`handleUpload`) fordi Vercel serverless
-  har ~4,5 MB request-body – telefonbilder er ofte større. Lesing går via
-  autentisert rute som redirecter til signert URL; bytene strømmes ikke
-  gjennom Serverless. Uten `BLOB_READ_WRITE_TOKEN` bygger appen og viser
-  metadata; opplasting feiler med synlig norsk melding.
+- **Filer**: `@vercel/blob`, befarings- **og** ordrevedlegg (bilder/PDF).
+  Metadata og e-postutdrag ligger i Neon (`inspection_files` / `order_files`).
+  Ingen forretningsdata i Supabase Storage. Klienten laster direkte til Blob
+  (`handleUpload`) fordi Vercel serverless har ~4,5 MB request-body –
+  telefonbilder er ofte større. Lesing går via autentisert rute som redirecter
+  til signert URL; bytene strømmes ikke gjennom Serverless. Uten
+  `BLOB_READ_WRITE_TOKEN` bygger appen og viser metadata; opplasting feiler
+  med synlig norsk melding.
 - **DB**: `@neondatabase/serverless` via `src/lib/db.ts`. Ikke ORM.
   Kolonnenavn i `updateOrderFields` og `updateInspectionFields` kommer fra
   typed whitelister – aldri interpolér brukerinput i SQL.
@@ -142,6 +143,6 @@ samtidig (testordrer bruker stiplet kant og bakgrunnstone i stedet).
 
 Env-variabler i `.env.local` (se `.env.example`): `DATABASE_URL` (Neon, delt
 med nettsiden), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-`BLOB_READ_WRITE_TOKEN` (Vercel Blob, kun befaringsvedlegg).
+`BLOB_READ_WRITE_TOKEN` (Vercel Blob, befarings- og ordrevedlegg).
 Uten de tre første bygger appen, men kjører ikke. Uten Blob-token bygger
 appen og viser vedleggsmetadata; opplasting feiler synlig.

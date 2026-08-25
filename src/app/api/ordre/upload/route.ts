@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server';
 import { requireUser } from '@/lib/auth';
 import { countOrderFiles, getOrder } from '@/lib/db';
 import { BLOB_TOKEN_MISSING, blobUploadConfigured } from '@/lib/inspection-blob';
-import { parseOrderUploadRequest } from '@/lib/order-file';
-import { ALLOWED_UPLOAD_MIME, MAX_FILE_BYTES, validateUploadFileCount } from '@/lib/upload';
+import { authorizeOrderUpload } from '@/lib/order-file';
+import { ALLOWED_UPLOAD_MIME, MAX_FILE_BYTES } from '@/lib/upload';
 
 export async function POST(request: Request): Promise<NextResponse> {
   await requireUser();
@@ -21,15 +21,11 @@ export async function POST(request: Request): Promise<NextResponse> {
       request,
       onBeforeGenerateToken: async (pathname, clientPayload) => {
         await requireUser();
-        const parsed = parseOrderUploadRequest(pathname, clientPayload);
-        if (!parsed.ok) throw new Error(parsed.error);
-
-        const order = await getOrder(parsed.data.orderId);
-        if (!order) throw new Error('Fant ikke ordren.');
-
-        const count = await countOrderFiles(parsed.data.orderId);
-        const room = validateUploadFileCount(count, 1, 'ordre');
-        if (!room.ok) throw new Error(room.error);
+        const authorized = await authorizeOrderUpload(pathname, clientPayload, {
+          getOrder,
+          countOrderFiles,
+        });
+        if (!authorized.ok) throw new Error(authorized.error);
 
         return {
           allowedContentTypes: [...ALLOWED_UPLOAD_MIME],

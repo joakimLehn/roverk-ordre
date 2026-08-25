@@ -47,12 +47,12 @@ export function InspectionDetail({
         <InspectionCustomerForm inspection={inspection} />
       </Section>
 
-      <Section title="Historikk">
-        <InspectionHistory inspectionId={inspection.id} files={files} />
-      </Section>
-
       <Section title="Internt notat">
         <InspectionNotesForm inspectionId={inspection.id} notes={inspection.notes ?? ''} />
+      </Section>
+
+      <Section title="Historikk">
+        <InspectionHistory inspectionId={inspection.id} files={files} />
       </Section>
     </>
   );

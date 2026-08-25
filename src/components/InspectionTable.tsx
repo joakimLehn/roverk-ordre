@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { Inspection } from '@/lib/inspection';
 import { formatInspectionWhen, isInspectionOverdue } from '@/lib/inspection';
-import { InspectionStatusBadge } from './Badge';
+import { InspectionStatusChip } from './InspectionStatusChip';
 
 const td = 'border-b border-line px-3 py-2.5';
 
@@ -52,8 +52,14 @@ export function InspectionTable({
                 </td>
                 <td className={`${td} ${cancelled ? 'text-muted' : ''}`}>{i.address || 'Mangler adresse'}</td>
                 <td className={`${td} whitespace-nowrap ${cancelled ? 'text-muted' : ''}`}>{i.phone ?? '–'}</td>
-                <td className={td}>
-                  <InspectionStatusBadge status={i.status} />
+                {/* Raden er klikkbar; statusbrikken skal ikke navigere i tillegg. */}
+                <td className={td} onClick={(e) => e.stopPropagation()}>
+                  <InspectionStatusChip
+                    inspectionId={i.id}
+                    name={i.name}
+                    current={i.status}
+                    className="focus-ring flex min-h-[30px] cursor-pointer items-center justify-center gap-1 rounded-full border-0 px-2.5 py-1 text-[11.5px] font-bold"
+                  />
                 </td>
                 <td className={`${td} tabular-nums text-muted`}>{i.file_count || '–'}</td>
               </tr>

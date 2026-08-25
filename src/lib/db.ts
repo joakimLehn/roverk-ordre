@@ -2,6 +2,7 @@ import 'server-only';
 import { neon } from '@neondatabase/serverless';
 import type { Inspection } from './inspection';
 import type { InspectionFile, InspectionFileKind } from './inspection-file';
+import { inspectionUpdateKeys, type InspectionEditableField } from './inspection-update';
 import { normalizeInspection, normalizeInspectionFile, normalizeOrder } from './normalize';
 import type { Order } from './types';
 
@@ -172,15 +173,11 @@ export async function insertInspection(data: NewInspection): Promise<string> {
   return rows[0].id;
 }
 
-type InspectionEditableField =
-  | 'name' | 'phone' | 'email' | 'address'
-  | 'scheduled_on' | 'scheduled_time' | 'status' | 'product' | 'channel' | 'notes';
-
 export async function updateInspectionFields(
   id: string,
   fields: Partial<Pick<Inspection, InspectionEditableField>>,
 ): Promise<void> {
-  const keys = Object.keys(fields) as InspectionEditableField[];
+  const keys = inspectionUpdateKeys(fields);
   if (keys.length === 0) return;
   const sets = keys.map((k, i) => `${k} = $${i + 2}`).join(', ');
   await sql().query(

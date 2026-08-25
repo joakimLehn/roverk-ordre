@@ -3,7 +3,13 @@ import { neon } from '@neondatabase/serverless';
 import type { Inspection } from './inspection';
 import type { InspectionFile, InspectionFileKind } from './inspection-file';
 import { inspectionUpdateKeys, type InspectionEditableField } from './inspection-update';
-import { normalizeInspection, normalizeInspectionFile, normalizeOrder } from './normalize';
+import {
+  normalizeInspection,
+  normalizeInspectionFile,
+  normalizeOrder,
+  normalizeOrderFile,
+} from './normalize';
+import type { OrderFile, OrderFileKind } from './order-file';
 import type { Order } from './types';
 
 let _sql: ReturnType<typeof neon> | null = null;
@@ -245,4 +251,62 @@ export async function insertInspectionFile(data: NewInspectionFile): Promise<str
 
 export async function deleteInspectionFile(id: string): Promise<void> {
   await sql().query('delete from inspection_files where id = $1', [id]);
+}
+
+const ORDER_FILE_COLS = `id, order_id, created_at, created_by, kind, filename,
+  content_type, byte_size, blob_pathname`;
+
+export async function listOrderFiles(orderId: string): Promise<OrderFile[]> {
+  const rows = (await sql().query(
+    `select ${ORDER_FILE_COLS}
+     from order_files
+     where order_id = $1
+     order by created_at asc`,
+    [orderId],
+  )) as Record<string, unknown>[];
+  return rows.map(normalizeOrderFile);
+}
+
+export async function getOrderFile(id: string): Promise<OrderFile | null> {
+  const rows = (await sql().query(
+    `select ${ORDER_FILE_COLS} from order_files where id = $1`,
+    [id],
+  )) as Record<string, unknown>[];
+  return rows[0] ? normalizeOrderFile(rows[0]) : null;
+}
+
+export async function countOrderFiles(orderId: string): Promise<number> {
+  const rows = (await sql().query(
+    'select count(*)::int as n from order_files where order_id = $1',
+    [orderId],
+  )) as { n: number }[];
+  return Number(rows[0]?.n ?? 0);
+}
+
+export interface NewOrderFile {
+  order_id: string;
+  created_by: string | null;
+  kind: OrderFileKind;
+  filename: string;
+  content_type: string | null;
+  byte_size: number | null;
+  blob_pathname: string;
+}
+
+export async function insertOrderFile(data: NewOrderFile): Promise<string> {
+  const rows = (await sql().query(
+    `insert into order_files
+       (order_id, created_by, kind, filename, content_type, byte_size, blob_pathname)
+     values ($1, $2, $3, $4, $5, $6, $7)
+     returning id`,
+    [
+      data.order_id, data.created_by, data.kind, data.filename, data.content_type,
+      data.byte_size, data.blob_pathname,
+    ],
+  )) as { id: string }[];
+  return rows[0].id;
+}
+
+export async function deleteOrderFile(id: string): Promise<void> {
+  await sql().query('delete from order_files where id = $1', [id]);
 }

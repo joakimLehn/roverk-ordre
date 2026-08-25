@@ -21,7 +21,7 @@ Vercel Blob = kun befaringsvedlegg (private bilder/PDF-er)
 - Denne appen leser samme tabell og legger til egne kolonner
   (`build_status`, `invoiced_at`, `paid_at`, `is_test`, `planned_build_date`,
   `internal_notes`) – nettsidens kolonner røres aldri.
-- Appen eier `allowed_emails`, `inspections` og `inspection_files`.
+- Appen eier `allowed_emails`, `inspections`, `inspection_files` og `order_files`.
 - Supabase brukes **kun** til autentisering. All forretningsdata ligger i Neon
   (pluss Vercel Blob for befaringsbilder/PDF, aldri i Supabase Storage).
 

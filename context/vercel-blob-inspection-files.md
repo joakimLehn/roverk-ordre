@@ -2,14 +2,17 @@
 
 ## Decision
 
-Befaringsbilder og PDF-er ligger i **privat Vercel Blob**. Indeks, metadata og innlimte e-postutdrag ligger i Neon `inspection_files`. Bytene går klient → Blob via `handleUpload`; den autentiserte fil-ruten redirecter til en signert URL (~60 min).
+Befarings- og ordrebilder/PDF-er ligger i **privat Vercel Blob**. Indeks og
+metadata ligger i Neon (`inspection_files` / `order_files`); innlimte
+e-postutdrag bare på befaring. Bytene går klient → Blob via `handleUpload`;
+den autentiserte fil-ruten redirecter til en signert URL (~60 min).
 
 ## Rejected
 
 - **Supabase Storage** — `AGENTS.md` og `context/neon-data-supabase-auth.md`: Supabase er kun auth. Kundebilder fra hjemmet er forretningsdata.
 - **`bytea` i Postgres** — Neon er ikke objektlager; 15 MB PDF-er hører ikke hjemme i raden.
 - **Opplasting gjennom Server Action** — Vercel serverless har ~4,5 MB request-body; telefonbilder er ofte større.
-- **Offentlige Blob-URL-er i HTML** — vedlegg er private; `<img src>` og PDF-lenker går via `/befaringer/[id]/filer/[fileId]`.
+- **Offentlige Blob-URL-er i HTML** — vedlegg er private; `<img src>` og PDF-lenker går via `/befaringer/[id]/filer/[fileId]` eller `/ordre/[id]/filer/[fileId]`.
 - **Ny PDF-/bilde-viewer** — nettleseren viser PDF; `<img>` viser vanlige bilder. Ingen `next/image` mot private URL-er.
 
 ## Reason
@@ -22,7 +25,7 @@ stated
 
 ## Evidence
 
-`src/app/api/befaringer/upload/route.ts`, `src/app/befaringer/[id]/filer/[fileId]/route.ts`, `package.json` (`@vercel/blob`)
+`src/app/api/befaringer/upload/route.ts`, `src/app/befaringer/[id]/filer/[fileId]/route.ts`, `src/app/api/ordre/upload/route.ts`, `src/app/ordre/[id]/filer/[fileId]/route.ts`, `package.json` (`@vercel/blob`)
 
 ## Source
 

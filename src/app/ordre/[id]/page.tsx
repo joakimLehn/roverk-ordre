@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireUser } from '@/lib/auth';
-import { getOrder } from '@/lib/db';
+import { getOrder, listOrderFiles } from '@/lib/db';
+import { toClientOrderFileView } from '@/lib/order-file';
 import { Header } from '@/components/Header';
 import { OrderDetail, OrderTitle } from '@/components/OrderDetail';
 import { TestFlag } from '@/components/EconomyChecks';
@@ -14,6 +15,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   const order = await getOrder(id);
   if (!order) notFound();
 
+  const files = (await listOrderFiles(id)).map(toClientOrderFileView);
+
   return (
     <>
       <Header email={email} />
@@ -25,7 +28,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           <OrderTitle order={order} />
         </div>
 
-        <OrderDetail order={order} />
+        <OrderDetail order={order} files={files} />
 
         <div className="border-t border-dashed border-line pt-3">
           <TestFlag orderId={order.id} kunde={order.name} isTest={order.is_test} />

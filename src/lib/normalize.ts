@@ -3,6 +3,7 @@
 // normaliseres her før de forlater db-laget.
 import type { Inspection, InspectionProduct, InspectionStatus } from './inspection';
 import type { InspectionFile, InspectionFileKind } from './inspection-file';
+import type { OrderFile, OrderFileKind } from './order-file';
 import type { Order } from './types';
 
 function pad(n: number): string {
@@ -64,6 +65,16 @@ export function normalizeInspectionFile(row: Record<string, unknown>): Inspectio
     ...(row as unknown as InspectionFile),
     created_at: toIsoString(row.created_at) ?? '',
     kind: row.kind as InspectionFileKind,
+    byte_size: typeof size === 'number' ? size : size == null ? null : Number(size),
+  };
+}
+
+export function normalizeOrderFile(row: Record<string, unknown>): OrderFile {
+  const size = row.byte_size;
+  return {
+    ...(row as unknown as OrderFile),
+    created_at: toIsoString(row.created_at) ?? '',
+    kind: row.kind as OrderFileKind,
     byte_size: typeof size === 'number' ? size : size == null ? null : Number(size),
   };
 }

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   normalizeInspection,
   normalizeOrder,
+  normalizeOrderFile,
   toDateString,
   toIsoString,
   toTimeString,
@@ -89,5 +90,24 @@ describe('normalize', () => {
     expect(o.invoiced_at).toBe('2026-08-10T00:00:00.000Z');
     expect(o.paid_at).toBeNull();
     expect(o.name).toBe('Kari');
+  });
+  it('normaliserer en ordrefil-rad uten Date-objekter', () => {
+    const f = normalizeOrderFile({
+      id: 'f1',
+      order_id: 'o1',
+      created_at: new Date('2026-08-25T10:00:00.000Z'),
+      created_by: 'ola@roverk.no',
+      kind: 'bilde',
+      filename: 'levering.jpg',
+      content_type: 'image/jpeg',
+      byte_size: '2048',
+      blob_pathname: 'orders/o1/levering.jpg',
+    });
+    expect(f.created_at).toBe('2026-08-25T10:00:00.000Z');
+    expect(f.byte_size).toBe(2048);
+    expect(f.kind).toBe('bilde');
+    for (const v of Object.values(f)) {
+      expect(v instanceof Date).toBe(false);
+    }
   });
 });

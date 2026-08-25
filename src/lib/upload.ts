@@ -80,3 +80,16 @@ export async function deleteBlobThenRecord(opts: {
   }
   await opts.deleteRecord();
 }
+
+/**
+ * Klient-sjekk før Blob-opplasting. Tom `type` avvises ikke – iOS/Android
+ * sender ofte blank MIME, og serveren validerer på nytt.
+ */
+export function clientUploadError(file: { size: number; type: string }): 'too-large' | 'bad-type' | null {
+  if (file.size > MAX_FILE_BYTES) return 'too-large';
+  if (file.type) {
+    const kind = kindFromContentType(file.type);
+    if (kind !== 'bilde' && kind !== 'pdf') return 'bad-type';
+  }
+  return null;
+}

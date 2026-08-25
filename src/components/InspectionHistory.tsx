@@ -270,8 +270,8 @@ export function InspectionHistory({
 
       {lightbox ? (
         <ImageLightbox
-          inspectionId={inspectionId}
-          file={lightbox}
+          src={inspectionFileHref(inspectionId, lightbox.id)}
+          filename={lightbox.filename}
           onClose={() => setLightbox(null)}
           onDelete={() => {
             setToDelete(lightbox);

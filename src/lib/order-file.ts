@@ -1,3 +1,6 @@
+import { formatDateNo } from './format';
+import { isRenderableImage } from './upload';
+
 export type OrderFileKind = 'bilde' | 'pdf';
 
 export interface OrderFile {
@@ -70,4 +73,26 @@ export function parseOrderUploadRequest(
     return { ok: false, error: 'Ugyldig filsti.' };
   }
   return { ok: true, data: { orderId } };
+}
+
+/** Dato, og opplaster hvis vi har den – lightbox-meta under bildet. */
+export function formatOrderFileMeta(createdAt: string, createdBy: string | null | undefined): string {
+  const date = formatDateNo(createdAt);
+  return createdBy ? `${date} · ${createdBy}` : date;
+}
+
+export function partitionOrderFiles(files: OrderFileView[]): {
+  images: OrderFileView[];
+  others: OrderFileView[];
+} {
+  const images: OrderFileView[] = [];
+  const others: OrderFileView[] = [];
+  for (const file of files) {
+    if (file.kind === 'bilde' && isRenderableImage(file.content_type, file.filename)) {
+      images.push(file);
+    } else {
+      others.push(file);
+    }
+  }
+  return { images, others };
 }

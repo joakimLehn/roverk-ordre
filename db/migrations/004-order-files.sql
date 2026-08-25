@@ -1,4 +1,5 @@
--- Ordrevedlegg eies av denne appen. Ingen nye kolonner på orders.
+-- Ordrevedlegg eies av denne appen. Ingen nye kolonner på orders
+-- (ikke nettsidens kolonner). FK mot orders.id er en referanse, ikke eierskap.
 -- Idempotent: trygg å kjøre flere ganger.
 
 create table if not exists order_files (

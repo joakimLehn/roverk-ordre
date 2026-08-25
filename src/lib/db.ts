@@ -3,8 +3,13 @@ import { neon } from '@neondatabase/serverless';
 import type { Inspection } from './inspection';
 import type { InspectionFile, InspectionFileKind } from './inspection-file';
 import { inspectionUpdateKeys, type InspectionEditableField } from './inspection-update';
-import { normalizeInspection, normalizeInspectionFile, normalizeOrder, normalizeOrderFile } from './normalize';
-import type { OrderFile } from './order-file';
+import {
+  normalizeInspection,
+  normalizeInspectionFile,
+  normalizeOrder,
+  normalizeOrderFile,
+} from './normalize';
+import type { OrderFile, OrderFileKind } from './order-file';
 import type { Order } from './types';
 
 let _sql: ReturnType<typeof neon> | null = null;
@@ -281,7 +286,7 @@ export async function countOrderFiles(orderId: string): Promise<number> {
 export interface NewOrderFile {
   order_id: string;
   created_by: string | null;
-  kind: OrderFile['kind'];
+  kind: OrderFileKind;
   filename: string;
   content_type: string | null;
   byte_size: number | null;

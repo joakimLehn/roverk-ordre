@@ -96,18 +96,44 @@ describe('normalize', () => {
       id: 'f1',
       order_id: 'o1',
       created_at: new Date('2026-08-25T10:00:00.000Z'),
-      created_by: 'ola@roverk.no',
+      created_by: 'a@roverk.no',
       kind: 'bilde',
       filename: 'levering.jpg',
       content_type: 'image/jpeg',
-      byte_size: '2048',
+      byte_size: 12,
       blob_pathname: 'orders/o1/levering.jpg',
     });
     expect(f.created_at).toBe('2026-08-25T10:00:00.000Z');
-    expect(f.byte_size).toBe(2048);
+    expect(f.byte_size).toBe(12);
     expect(f.kind).toBe('bilde');
+    expect(f.blob_pathname).toBe('orders/o1/levering.jpg');
     for (const v of Object.values(f)) {
       expect(v instanceof Date).toBe(false);
     }
+  });
+  it('ordrefil: byte_size som streng blir tall, null forblir null', () => {
+    const asString = normalizeOrderFile({
+      id: 'f1',
+      order_id: 'o1',
+      created_at: new Date('2026-08-25T10:00:00.000Z'),
+      kind: 'pdf',
+      filename: 'tilbud.pdf',
+      content_type: 'application/pdf',
+      byte_size: '2048',
+      blob_pathname: 'orders/o1/tilbud.pdf',
+    });
+    expect(asString.byte_size).toBe(2048);
+    expect(typeof asString.created_at).toBe('string');
+
+    const missing = normalizeOrderFile({
+      id: 'f2',
+      order_id: 'o1',
+      created_at: new Date('2026-08-25T10:00:00.000Z'),
+      kind: 'bilde',
+      filename: 'fil',
+      byte_size: null,
+      blob_pathname: 'orders/o1/fil.jpg',
+    });
+    expect(missing.byte_size).toBeNull();
   });
 });

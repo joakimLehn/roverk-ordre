@@ -31,7 +31,9 @@ separat til Vercel). Denne appen:
 - må ALDRI endre semantikken til nettsidens kolonner (`status`, `config`,
   `utm`, `notify`, `address_meta`) – nettsiden er avsender, vi er mottaker
 - alle migreringer skal være idempotente (`add column if not exists`) og
-  ligge i `db/migrations/`
+  ligge i `db/migrations/`. De føres i `schema_migrations` (filnavn +
+  sjekksum) og kjøres av GitHub Action-en når de lander på `main`. En fil som
+  er kjørt skal aldri redigeres – ny endring, ny fil.
 
 ## Arkitektur
 

@@ -1,0 +1,37 @@
+# Kjører db/migrations mot den delte Neon-basen når en migrering lander på main.
+# Skriptet fører hver fil i schema_migrations, så en fil som alt er kjørt
+# hoppes over. DATABASE_URL må ligge som repo-secret.
+name: Migrer database
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'db/migrations/**'
+      - 'scripts/migrate.mjs'
+      - '.github/workflows/migrer-database.yml'
+  workflow_dispatch:
+
+# Aldri to migreringer mot samme base samtidig. Køen skal gå i rekkefølge,
+# så en ventende kjøring skal ikke avbrytes.
+concurrency:
+  group: migrer-database
+  cancel-in-progress: false
+
+jobs:
+  migrer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Kjør migreringene
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: node scripts/migrate.mjs

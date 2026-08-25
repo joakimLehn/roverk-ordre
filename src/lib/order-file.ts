@@ -1,5 +1,9 @@
 import { formatDateNo } from './format';
-import { isRenderableImage } from './upload';
+import {
+  isRenderableImage,
+  validateUploadFile,
+  validateUploadFileCount,
+} from './upload';
 
 export type OrderFileKind = 'bilde' | 'pdf';
 
@@ -73,6 +77,60 @@ export function parseOrderUploadRequest(
     return { ok: false, error: 'Ugyldig filsti.' };
   }
   return { ok: true, data: { orderId } };
+}
+
+/**
+ * Token-ruten: parse + ordren finnes + plass. Mangler ordre → ingen token,
+ * og vi teller ikke filer.
+ */
+export async function authorizeOrderUpload(
+  pathname: string,
+  clientPayload: string | null,
+  lookup: {
+    getOrder: (id: string) => Promise<unknown | null>;
+    countOrderFiles: (id: string) => Promise<number>;
+  },
+): Promise<ParseResult<{ orderId: string }>> {
+  const parsed = parseOrderUploadRequest(pathname, clientPayload);
+  if (!parsed.ok) return parsed;
+  const order = await lookup.getOrder(parsed.data.orderId);
+  if (!order) return { ok: false, error: 'Fant ikke ordren.' };
+  const count = await lookup.countOrderFiles(parsed.data.orderId);
+  const room = validateUploadFileCount(count, 1, 'ordre');
+  if (!room.ok) return room;
+  return parsed;
+}
+
+export function validateOrderFileInsert(input: {
+  orderId: string;
+  pathname: string;
+  contentType: string;
+  byteSize: number;
+  currentFileCount: number;
+}): { ok: true; kind: OrderFileKind } | { ok: false; error: string } {
+  const parsed = validateUploadFile({
+    contentType: input.contentType,
+    byteSize: input.byteSize,
+  });
+  if (!parsed.ok) return parsed;
+  const room = validateUploadFileCount(input.currentFileCount, 1, 'ordre');
+  if (!room.ok) return room;
+  if (!isOrderBlobPath(input.orderId, input.pathname)) {
+    return { ok: false, error: 'Ugyldig filsti.' };
+  }
+  return { ok: true, kind: parsed.kind };
+}
+
+export function orderFileDisplayName(filename: string): string {
+  return filename.trim() || 'fil';
+}
+
+/** Fil-ruten: mangler rad, feil ordre eller tom blob-sti → 404. */
+export function canServeOrderFile(
+  file: Pick<OrderFile, 'order_id' | 'blob_pathname'> | null,
+  orderId: string,
+): file is Pick<OrderFile, 'order_id' | 'blob_pathname'> {
+  return Boolean(file && file.order_id === orderId && file.blob_pathname);
 }
 
 /** Dato, og opplaster hvis vi har den – lightbox-meta under bildet. */

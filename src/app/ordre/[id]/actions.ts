@@ -14,10 +14,13 @@ import {
 } from '@/lib/db';
 import { deleteInspectionBlob } from '@/lib/inspection-blob';
 import { parseBestillingEdit } from '@/lib/edit-order';
-import { isOrderBlobPath } from '@/lib/order-file';
+import {
+  orderFileDisplayName,
+  validateOrderFileInsert,
+} from '@/lib/order-file';
 import { isBuildStatus } from '@/lib/status';
 import { normalizeEmail } from '@/lib/email';
-import { deleteBlobThenRecord, validateUploadFile, validateUploadFileCount } from '@/lib/upload';
+import { deleteBlobThenRecord } from '@/lib/upload';
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -136,22 +139,20 @@ export async function saveOrderFile(input: {
   if (!order) throw new Error('Fant ikke ordren.');
 
   const count = await countOrderFiles(input.orderId);
-  const parsed = validateUploadFile({
+  const parsed = validateOrderFileInsert({
+    orderId: input.orderId,
+    pathname: input.pathname,
     contentType: input.contentType,
     byteSize: input.byteSize,
+    currentFileCount: count,
   });
   if (!parsed.ok) throw new Error(parsed.error);
-  const room = validateUploadFileCount(count, 1, 'ordre');
-  if (!room.ok) throw new Error(room.error);
-  if (!isOrderBlobPath(input.orderId, input.pathname)) {
-    throw new Error('Ugyldig filsti.');
-  }
 
   await insertOrderFile({
     order_id: input.orderId,
     created_by: email,
     kind: parsed.kind,
-    filename: input.filename.trim() || 'fil',
+    filename: orderFileDisplayName(input.filename),
     content_type: input.contentType,
     byte_size: input.byteSize,
     blob_pathname: input.pathname,

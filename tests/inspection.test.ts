@@ -9,7 +9,10 @@ import {
   INSPECTION_STATUS_LABELS,
   applyInspectionView,
   formatInspectionWhen,
+  inspectionViewCounts,
+  inspectionViewFromQuery,
   inspectionViewHref,
+  isInspectionOverdue,
   isInspectionProduct,
   isInspectionStatus,
   isInspectionViewKey,
@@ -199,6 +202,28 @@ describe('visning og søk', () => {
     expect(isInspectionViewKey(undefined)).toBe(false);
   });
 
+  it('leser vis-query og faller tilbake til kommende', () => {
+    expect(inspectionViewFromQuery('ferdig')).toBe('ferdig');
+    expect(inspectionViewFromQuery('alle')).toBe('alle');
+    expect(inspectionViewFromQuery('kommende')).toBe('kommende');
+    expect(inspectionViewFromQuery(undefined)).toBe('kommende');
+    expect(inspectionViewFromQuery('bygge')).toBe('kommende');
+    expect(inspectionViewFromQuery('')).toBe('kommende');
+  });
+
+  it('teller visningene innenfor søketreffene', () => {
+    const set = [
+      item({ id: 'a', status: 'aktiv', name: 'Per Hansen' }),
+      item({ id: 'b', status: 'gjennomfort', name: 'Per Olsen' }),
+      item({ id: 'c', status: 'aktiv', name: 'Kari' }),
+    ];
+    expect(inspectionViewCounts(searchInspections(set, 'per'))).toEqual({
+      kommende: 1,
+      ferdig: 1,
+      alle: 2,
+    });
+  });
+
   it('søker case-insensitive i navn, telefon, e-post og adresse', () => {
     const set = [
       item({ id: 'n', name: 'Per Hansen', phone: '90011122', email: 'per@epost.no', address: 'Kvamveien 1' }),
@@ -245,6 +270,22 @@ describe('formatInspectionWhen', () => {
   it('sier Ikke avtalt uten dato', () => {
     expect(formatInspectionWhen(null, null, today)).toBe('Ikke avtalt');
     expect(formatInspectionWhen(null, '10:00', today)).toBe('Ikke avtalt');
+  });
+});
+
+describe('isInspectionOverdue', () => {
+  const today = '2026-08-24';
+
+  it('flagger aktiv befaring med avtalt dag før i dag', () => {
+    expect(isInspectionOverdue(item({ status: 'aktiv', scheduled_on: '2026-08-23' }), today)).toBe(true);
+  });
+
+  it('flagger ikke i dag, fremtid, uten dato, eller ferdig/avlyst', () => {
+    expect(isInspectionOverdue(item({ status: 'aktiv', scheduled_on: today }), today)).toBe(false);
+    expect(isInspectionOverdue(item({ status: 'aktiv', scheduled_on: '2026-08-25' }), today)).toBe(false);
+    expect(isInspectionOverdue(item({ status: 'aktiv', scheduled_on: null }), today)).toBe(false);
+    expect(isInspectionOverdue(item({ status: 'avlyst', scheduled_on: '2026-08-01' }), today)).toBe(false);
+    expect(isInspectionOverdue(item({ status: 'gjennomfort', scheduled_on: '2026-08-01' }), today)).toBe(false);
   });
 });
 

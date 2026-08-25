@@ -63,12 +63,15 @@ npm run build      # produksjonsbygg
 ## Mobil
 
 Mobil er primærflaten for snekkerne, så lista rendres som kort under 768 px
-(Tailwinds `md:` – tabell fra og med 768). Navigasjonen ligger i en bunnlinje
-i tommelsonen med «Å bygge» / «Å fakturere» / «Alle» og tallet over etiketten;
-KPI-rutenettet er derfor bare skrivebord. Byggstatus endres via bunnark med
+(Tailwinds `md:` – tabell fra og med 768). Seksjon (Ordrer / Befaringer)
+ligger i headeren; visninger ligger i en bunnlinje i tommelsonen. På ordrer
+er det «Å bygge» / «Å fakturere» / «Alle»; på befaringer «Kommende» /
+«Ferdig» / «Alle». Tallet står over etiketten. KPI-rutenettet er derfor
+bare skrivebord, og bare på ordrer. Byggstatus endres via bunnark med
 fire store valg, og fakturert/betalt er én brikke i tre trinn på kortet.
 «Å bygge» grupperes på byggedato: Forfalt / I dag / Denne uka / Senere /
-Uten byggedato. Detaljsiden har Ring- og Veibeskrivelse-knapper.
+Uten byggedato. Kommende befaringer grupperes på avtalt dato på samme måte.
+Detaljsiden har Ring- og Veibeskrivelse-knapper.
 
 Alle endringer er **optimistiske** – brikka flytter seg med én gang, serveren
 bekrefter i bakgrunnen, og hver endring kan angres i 5 sekunder fra toasten.
@@ -114,10 +117,11 @@ plukklistene i `roverk as/01-Produkter/*/Kalkyler/`:
 db/migrations/     idempotente SQL-migreringer mot Neon
 scripts/           migrate.mjs, add-email.mjs (allowlist)
 src/lib/           domenelogikk (status, kpi, format, money, age, groups, sort,
-                   views, inspection-file) + db.ts, auth.ts, supabase.ts
+                   views, inspection, inspection-file) + db.ts, auth.ts, supabase.ts
 src/data/          materials.ts – statisk materialbehov
 src/components/    UI-komponenter (tabell, badges, skjemaer)
-src/app/           / (liste), /ordre/[id] (detalj), /befaringer/[id],
+src/app/           / (ordreliste), /ordre/[id], /ordre/ny,
+                   /befaringer (liste), /befaringer/[id], /befaringer/ny,
                    /api/befaringer/upload, /login
 docs/superpowers/  design-spec og implementasjonsplan
 ```

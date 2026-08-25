@@ -9,7 +9,7 @@ const sql = readFileSync(
 const withoutComments = sql.replace(/--.*$/gm, '');
 
 describe('004-order-files.sql', () => {
-  it('oppretter tabell og indeks med if not exists', () => {
+  it('oppretter order_files og indeksen med if not exists', () => {
     expect(sql).toMatch(/create table if not exists order_files\b/i);
     expect(sql).toMatch(/create index if not exists order_files_order_idx/i);
     expect(sql).toMatch(/references orders/i);

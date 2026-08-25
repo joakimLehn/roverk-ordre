@@ -1,6 +1,7 @@
 import { materialsFor } from '@/data/materials';
 import { configEntries, formatDateNo, formatPrice, siteLabel } from '@/lib/format';
 import { schemaSite } from '@/lib/edit-order';
+import type { OrderFileView } from '@/lib/order-file';
 import type { Order } from '@/lib/types';
 import { ContactActions } from '@/components/ContactActions';
 import { StatusButtons } from '@/components/StatusButtons';
@@ -8,6 +9,7 @@ import { EconomyChecks } from '@/components/EconomyChecks';
 import { NotesForm, PlannedDate } from '@/components/NotesForm';
 import { CustomerForm } from '@/components/CustomerForm';
 import { BestillingForm } from '@/components/BestillingForm';
+import { OrderAttachments } from '@/components/OrderAttachments';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -66,7 +68,15 @@ export function OrderMaterials({ order }: { order: Order }) {
  * skrivebord. `compact` kutter feltene man ikke redigerer mens man går gjennom
  * en bunke – panelet skal svare «hva er dette», ikke være et helt skjema.
  */
-export function OrderDetail({ order, compact = false }: { order: Order; compact?: boolean }) {
+export function OrderDetail({
+  order,
+  compact = false,
+  files,
+}: {
+  order: Order;
+  compact?: boolean;
+  files?: OrderFileView[];
+}) {
   const cfg = configEntries(order.config);
 
   return (
@@ -76,6 +86,12 @@ export function OrderDetail({ order, compact = false }: { order: Order; compact?
       <Section title="Byggstatus">
         <StatusButtons orderId={order.id} kunde={order.name} current={order.build_status} />
       </Section>
+
+      {compact ? null : (
+        <Section title="Bilder og vedlegg">
+          <OrderAttachments orderId={order.id} files={files ?? []} />
+        </Section>
+      )}
 
       <Section title="Økonomi">
         <EconomyChecks

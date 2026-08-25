@@ -10,6 +10,7 @@ import {
   ALLOWED_UPLOAD_MIME,
   MAX_FILE_BYTES,
   MAX_FILES,
+  clientUploadError,
   deleteBlobThenRecord,
   isRenderableImage,
   kindFromContentType,
@@ -166,5 +167,15 @@ describe('inspection-alias', () => {
     expect(count).toEqual(validateUploadFileCount(MAX_FILES, 1, 'befaring'));
     expect(count.ok).toBe(false);
     if (!count.ok) expect(count.error).toContain('per befaring');
+  });
+});
+
+describe('clientUploadError', () => {
+  it('godtar jpeg under grensen', () => {
+    expect(clientUploadError({ size: 1024, type: 'image/jpeg' })).toBeNull();
+  });
+
+  it('avviser fil over 15 MB', () => {
+    expect(clientUploadError({ size: MAX_FILE_BYTES + 1, type: 'image/jpeg' })).toBe('too-large');
   });
 });

@@ -2,7 +2,7 @@
 
 ## Decision
 
-Denne appen eier `order_files` i den delte Neon-basen, samme mønster som `inspection_files`: full CRUD, idempotent migrering, ingen nye kolonner på `orders`. FK mot `orders.id` med `on delete cascade` er tillatt; nettsidens kolonner røres ikke.
+Denne appen eier `order_files` i den delte Neon-basen, samme mønster som `inspection_files`: full CRUD, idempotent migrering, ingen nye kolonner på `orders`, ingen skriving til `config`. FK mot `orders.id` med `on delete cascade` er tillatt; nettsidens kolonner røres ikke.
 
 ## Rejected
 

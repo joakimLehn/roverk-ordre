@@ -4,6 +4,8 @@ import {
   orderBlobPrefix,
   orderFileHref,
   parseOrderUploadRequest,
+  partitionOrderFiles,
+  formatOrderFileMeta,
   toClientOrderFileView,
 } from '@/lib/order-file';
 
@@ -111,5 +113,56 @@ describe('toClientOrderFileView', () => {
     });
     expect(view).not.toHaveProperty('blob_pathname');
     expect(view.filename).toBe('levering.jpg');
+  });
+});
+
+describe('formatOrderFileMeta', () => {
+  it('viser dato og opplaster når created_by er satt', () => {
+    expect(formatOrderFileMeta('2026-08-14T00:00:00.000Z', 'ola@roverk.no')).toBe(
+      '14. aug. 2026 · ola@roverk.no',
+    );
+  });
+
+  it('viser bare dato når created_by mangler', () => {
+    expect(formatOrderFileMeta('2026-08-14T00:00:00.000Z', null)).toBe('14. aug. 2026');
+  });
+});
+
+describe('partitionOrderFiles', () => {
+  it('legger jpeg i galleriet og heic/pdf i rader', () => {
+    const { images, others } = partitionOrderFiles([
+      {
+        id: '1',
+        order_id: 'o1',
+        created_at: '2026-08-25T00:00:00.000Z',
+        created_by: null,
+        kind: 'bilde',
+        filename: 'a.jpg',
+        content_type: 'image/jpeg',
+        byte_size: 1,
+      },
+      {
+        id: '2',
+        order_id: 'o1',
+        created_at: '2026-08-25T00:00:00.000Z',
+        created_by: null,
+        kind: 'bilde',
+        filename: 'b.heic',
+        content_type: 'image/heic',
+        byte_size: 1,
+      },
+      {
+        id: '3',
+        order_id: 'o1',
+        created_at: '2026-08-25T00:00:00.000Z',
+        created_by: null,
+        kind: 'pdf',
+        filename: 'c.pdf',
+        content_type: 'application/pdf',
+        byte_size: 1,
+      },
+    ]);
+    expect(images.map((f) => f.id)).toEqual(['1']);
+    expect(others.map((f) => f.id)).toEqual(['2', '3']);
   });
 });

@@ -14,13 +14,16 @@ roverk.no (nettsiden)  ──skriver──>  Neon Postgres (orders-tabellen)
                                           ▲
 ordre.roverk.no (denne appen) ──leser/oppdaterer──┘
 Supabase  = kun innlogging (e-post-OTP)
+Vercel Blob = kun befaringsvedlegg (private bilder/PDF-er)
 ```
 
 - Nettsiden (`roverk as/03-Nettsider`) skriver nye ordrer til `orders` i Neon.
 - Denne appen leser samme tabell og legger til egne kolonner
   (`build_status`, `invoiced_at`, `paid_at`, `is_test`, `planned_build_date`,
   `internal_notes`) – nettsidens kolonner røres aldri.
-- Supabase brukes **kun** til autentisering. All data ligger i Neon.
+- Appen eier `allowed_emails`, `inspections` og `inspection_files`.
+- Supabase brukes **kun** til autentisering. All forretningsdata ligger i Neon
+  (pluss Vercel Blob for befaringsbilder/PDF, aldri i Supabase Storage).
 
 ## Oppsett (engangsjobb)
 
@@ -39,8 +42,14 @@ Supabase  = kun innlogging (e-post-OTP)
    ```bash
    node --env-file=.env.local scripts/add-email.mjs ola@snekker.no
    ```
-5. **Vercel**: nytt prosjekt av dette repoet, sett de tre env-variablene,
+5. **Vercel**: nytt prosjekt av dette repoet, sett de fire env-variablene,
    legg til domenet `ordre.roverk.no`.
+6. **Vercel Blob** (befaringsvedlegg): Joakim oppretter en **privat** Blob-store
+   på prosjektet som deployer `ordre.roverk.no`, og setter
+   `BLOB_READ_WRITE_TOKEN` på preview og production (og Development for lokal
+   `vercel env pull`). Uten token bygger appen og viser vedleggsmetadata;
+   opplasting feiler med en synlig norsk melding. Tokenet brukes ikke til
+   annet enn befaringsfiler.
 
 ## Utvikling
 
@@ -54,12 +63,15 @@ npm run build      # produksjonsbygg
 ## Mobil
 
 Mobil er primærflaten for snekkerne, så lista rendres som kort under 768 px
-(Tailwinds `md:` – tabell fra og med 768). Navigasjonen ligger i en bunnlinje
-i tommelsonen med «Å bygge» / «Å fakturere» / «Alle» og tallet over etiketten;
-KPI-rutenettet er derfor bare skrivebord. Byggstatus endres via bunnark med
+(Tailwinds `md:` – tabell fra og med 768). Seksjon (Ordrer / Befaringer)
+ligger i headeren; visninger ligger i en bunnlinje i tommelsonen. På ordrer
+er det «Å bygge» / «Å fakturere» / «Alle»; på befaringer «Kommende» /
+«Ferdig» / «Alle». Tallet står over etiketten. KPI-rutenettet er derfor
+bare skrivebord, og bare på ordrer. Byggstatus endres via bunnark med
 fire store valg, og fakturert/betalt er én brikke i tre trinn på kortet.
 «Å bygge» grupperes på byggedato: Forfalt / I dag / Denne uka / Senere /
-Uten byggedato. Detaljsiden har Ring- og Veibeskrivelse-knapper.
+Uten byggedato. Kommende befaringer grupperes på avtalt dato på samme måte.
+Detaljsiden har Ring- og Veibeskrivelse-knapper.
 
 Alle endringer er **optimistiske** – brikka flytter seg med én gang, serveren
 bekrefter i bakgrunnen, og hver endring kan angres i 5 sekunder fra toasten.
@@ -105,10 +117,12 @@ plukklistene i `roverk as/01-Produkter/*/Kalkyler/`:
 db/migrations/     idempotente SQL-migreringer mot Neon
 scripts/           migrate.mjs, add-email.mjs (allowlist)
 src/lib/           domenelogikk (status, kpi, format, money, age, groups, sort,
-                   views) + db.ts, auth.ts, supabase.ts
+                   views, inspection, inspection-file) + db.ts, auth.ts, supabase.ts
 src/data/          materials.ts – statisk materialbehov
 src/components/    UI-komponenter (tabell, badges, skjemaer)
-src/app/           / (liste), /ordre/[id] (detalj), /login
+src/app/           / (ordreliste), /ordre/[id], /ordre/ny,
+                   /befaringer (liste), /befaringer/[id], /befaringer/ny,
+                   /api/befaringer/upload, /login
 docs/superpowers/  design-spec og implementasjonsplan
 ```
 

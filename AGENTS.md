@@ -73,9 +73,12 @@ Snekkerne bruker appen stående, med én hånd, ofte med hansker. Derfor:
   (`OrderTable`). Begge kaller de samme server-handlingene.
 - Trykkflater skal være minst 44 px høye. Nedtrekksmenyer unngås for
   hyppige valg – bruk bunnark (`StatusSheet`) i stedet.
-- Primærnavigasjonen på mobil er `BottomNav` – nederst, i tommelsonen, med
-  tallene fra `viewCounts`. Øvre tredjedel av skjermen rekker ikke tommelen,
-  så ingenting hyppig skal ligge der. `ViewTabs` er skrivebordets variant.
+- To navigasjonsnivåer: **seksjon** (Ordrer | Befaringer) ligger i `Header`
+  – det byttes sjelden, før turen. **Visninger** ligger i seksjonens
+  `BottomNav` i tommelsonen. Ordre-bunnlinja er Å bygge / Å fakturere /
+  Alle (+ ny ordre) og får **ingen fjerde fane**. Befaringer er `/befaringer`
+  med egen `InspectionBottomNav` (Kommende / Ferdig / Alle + ny befaring).
+  `ViewTabs` / `InspectionViewTabs` er skrivebordets variant.
 - Skjemafelt bruker `text-base` på mobil – mindre enn 16 px gjør at iOS
   zoomer inn ved fokus.
 

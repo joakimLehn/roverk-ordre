@@ -77,6 +77,19 @@ export function isInspectionViewKey(v: unknown): v is InspectionViewKey {
   return v === 'kommende' || v === 'ferdig' || v === 'alle';
 }
 
+/** Query `vis` på lista. Ukjent eller manglende verdi blir kommende. */
+export function inspectionViewFromQuery(vis: unknown): InspectionViewKey {
+  return isInspectionViewKey(vis) ? vis : 'kommende';
+}
+
+/** Forfalt: avtalt dag før i dag, og fortsatt aktiv. Ikke avlyst/gjennomført. */
+export function isInspectionOverdue(
+  item: Pick<Inspection, 'status' | 'scheduled_on'>,
+  today: string,
+): boolean {
+  return item.status === 'aktiv' && item.scheduled_on != null && item.scheduled_on < today;
+}
+
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 /** HTML time kan sende HH:MM eller HH:MM:SS. Vi lagrer HH:MM. */
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;

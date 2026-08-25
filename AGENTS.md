@@ -47,8 +47,8 @@ separat til Vercel). Denne appen:
   gjennom Serverless. Uten `BLOB_READ_WRITE_TOKEN` bygger appen og viser
   metadata; opplasting feiler med synlig norsk melding.
 - **DB**: `@neondatabase/serverless` via `src/lib/db.ts`. Ikke ORM.
-  Kolonnenavn i `updateOrderFields` kommer fra en typed whitelist –
-  aldri interpolér brukerinput i SQL.
+  Kolonnenavn i `updateOrderFields` og `updateInspectionFields` kommer fra
+  typed whitelister – aldri interpolér brukerinput i SQL.
 - **Auth**: Supabase e-post-OTP (`@supabase/ssr`). Supabase brukes KUN til
   auth – aldri lagre forretningsdata der (heller ikke Storage). Flyt:
   1. `/login`: e-post sjekkes mot `allowed_emails` i Neon FØR kode sendes

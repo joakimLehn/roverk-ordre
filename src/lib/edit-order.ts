@@ -31,6 +31,7 @@ export interface ProductFieldDefaults {
   orden_w: string;
   orden_h: string;
   orden_hjul: boolean;
+  annet_beskrivelse: string;
 }
 
 export const NEW_ORDER_FIELD_DEFAULTS: ProductFieldDefaults = {
@@ -44,6 +45,7 @@ export const NEW_ORDER_FIELD_DEFAULTS: ProductFieldDefaults = {
   orden_w: '3',
   orden_h: '4',
   orden_hjul: false,
+  annet_beskrivelse: '',
 };
 
 function intInRangeAsString(v: unknown, min: number, max: number): string | null {
@@ -81,6 +83,9 @@ export function bestillingFormDefaults(
         : navn === 'Medium' || size === 'medium' ? 'Medium'
           : d.ved_modell;
     return { ...d, ved_modell: modell };
+  }
+  if (schema === 'annet') {
+    return { ...d, annet_beskrivelse: typeof config.beskrivelse === 'string' ? config.beskrivelse : '' };
   }
   return {
     ...d,

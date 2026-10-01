@@ -9,6 +9,7 @@ const SITE_LABELS: Record<string, string> = {
   ved: 'Ved',
   orden: 'Orden',
   'orden-v2': 'Orden',
+  annet: 'Annet',
 };
 
 export function siteLabel(site: string): string {
@@ -31,6 +32,7 @@ const CONFIG_KEY_LABELS: Record<string, string> = {
   h: 'Høyde (kasser)',
   withWheels: 'Hjul',
   withTop: 'Topplate',
+  beskrivelse: 'Beskrivelse',
   kanal: 'Kanal',
   manuell: 'Manuell ordre',
   registrert_av: 'Registrert av',

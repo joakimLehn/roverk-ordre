@@ -86,6 +86,25 @@ function OrdenFields({ d }: { d: ProductFieldDefaults }) {
   );
 }
 
+function AnnetFields({ d }: { d: ProductFieldDefaults }) {
+  return (
+    <fieldset className="grid gap-3 rounded-xl border border-line bg-sand/60 p-3.5">
+      <legend className="px-1 text-xs font-semibold text-muted">Hva er bestilt?</legend>
+      <label className={label}>
+        Beskrivelse *
+        <input
+          name="annet_beskrivelse"
+          required
+          maxLength={200}
+          defaultValue={d.annet_beskrivelse}
+          placeholder="F.eks. «Postkassestativ, 3 kasser»"
+          className={`${input} mt-1`}
+        />
+      </label>
+    </fieldset>
+  );
+}
+
 export function ProductConfigFields({
   site,
   defaults = NEW_ORDER_FIELD_DEFAULTS,
@@ -97,5 +116,6 @@ export function ProductConfigFields({
   if (schema === 'skjul') return <SkjulFields d={defaults} />;
   if (schema === 'ved') return <VedFields d={defaults} />;
   if (schema === 'orden') return <OrdenFields d={defaults} />;
+  if (schema === 'annet') return <AnnetFields d={defaults} />;
   return null;
 }

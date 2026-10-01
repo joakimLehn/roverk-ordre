@@ -251,4 +251,20 @@ describe('bestillingFormDefaults', () => {
   it('ved: size brukes når navn mangler', () => {
     expect(bestillingFormDefaults('ved', { size: 'stor' })?.ved_modell).toBe('Stor');
   });
+
+  it('annet: beskrivelse fylles inn og kan redigeres', () => {
+    const config = { beskrivelse: 'Postkassestativ', manuell: true, kanal: 'Telefon' };
+    const d = bestillingFormDefaults('annet', config);
+    expect(d?.annet_beskrivelse).toBe('Postkassestativ');
+    const r = parseBestillingEdit(
+      { site: 'annet', config, price_nok: null },
+      { annet_beskrivelse: 'Postkassestativ med tak' },
+      REDIGERER,
+      NAA,
+    );
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.data.product).toBe('Postkassestativ med tak');
+    expect(r.data.config).toMatchObject({ beskrivelse: 'Postkassestativ med tak', manuell: true, kanal: 'Telefon' });
+  });
 });

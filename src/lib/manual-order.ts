@@ -14,7 +14,9 @@ export interface ManualOrderInput {
   internal_notes: string | null;
 }
 
-export const MANUAL_SITES = ['skjul', 'ved', 'orden'] as const;
+export const MANUAL_SITES = ['skjul', 'ved', 'orden', 'annet'] as const;
+
+const ANNET_MAX_LEN = 200;
 export const KANALER = ['E-post', 'Instagram', 'Facebook', 'Telefon', 'Annet'] as const;
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -65,6 +67,13 @@ export function buildProduct(site: string, f: Record<string, string>):
       config: { navn: modell, size: modell.toLowerCase() },
       productText: `Vedskjul ${modell}`,
     };
+  }
+  if (site === 'annet') {
+    // Spesialbestillinger utenom de tre produktene: fritekst er hele «konfigurasjonen».
+    const beskrivelse = (f.annet_beskrivelse ?? '').trim();
+    if (!beskrivelse) return { error: 'Beskriv hva som er bestilt.' };
+    if (beskrivelse.length > ANNET_MAX_LEN) return { error: `Beskrivelsen kan maks være ${ANNET_MAX_LEN} tegn.` };
+    return { config: { beskrivelse }, productText: beskrivelse };
   }
   // orden
   const bt = f.orden_bt === '100L' ? '100L' : '60L';

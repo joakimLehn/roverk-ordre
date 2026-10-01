@@ -122,6 +122,7 @@ export function Filters({ params }: { params: FilterParams }) {
               <option value="skjul">Skjul</option>
               <option value="ved">Ved</option>
               <option value="orden">Orden</option>
+              <option value="annet">Annet</option>
             </select>
             <select
               name="status"

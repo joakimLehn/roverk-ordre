@@ -29,6 +29,7 @@ export function NewOrderForm() {
             <option value="skjul">Skjul</option>
             <option value="ved">Ved</option>
             <option value="orden">Orden</option>
+            <option value="annet">Annet (fritekst)</option>
           </select>
         </label>
         <label className={label}>

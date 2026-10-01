@@ -56,4 +56,12 @@ describe('parseManualOrder', () => {
     expect(r.ok && r.data.preferred_date).toBeNull();
     expect(r.ok && r.data.product).toBe('Spesial dobbel');
   });
+  it('annet: fritekst blir produkttekst og config.beskrivelse, tom tekst avvises', () => {
+    const r = parseManualOrder({ site: 'annet', name: 'Per', annet_beskrivelse: '  Postkassestativ, 3 kasser ' });
+    expect(r.ok && r.data.site).toBe('annet');
+    expect(r.ok && r.data.config).toEqual({ beskrivelse: 'Postkassestativ, 3 kasser' });
+    expect(r.ok && r.data.product).toBe('Postkassestativ, 3 kasser');
+    expect(parseManualOrder({ site: 'annet', name: 'Per', annet_beskrivelse: '   ' }).ok).toBe(false);
+    expect(parseManualOrder({ site: 'annet', name: 'Per', annet_beskrivelse: 'x'.repeat(201) }).ok).toBe(false);
+  });
 });

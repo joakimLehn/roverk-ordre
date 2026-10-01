@@ -106,5 +106,5 @@ export function materialsFor(site: string, config: Record<string, unknown>): Mat
     if (configContains(config, 'medium')) return VED_MEDIUM;
     return null; // variant ukjent -> heller ingenting enn feil liste
   }
-  return null; // orden har ingen plukkliste ennå
+  return null; // orden har ingen plukkliste ennå; annet er fritekst
 }

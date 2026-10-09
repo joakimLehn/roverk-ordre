@@ -8,7 +8,8 @@ function o(p: Partial<Order>): Order {
     config: {}, preferred_date: null, name: 'n', phone: null, email: null,
     address: null, address_meta: {}, price_nok: null, build_status: 'ny',
     invoiced_at: null, paid_at: null, is_test: false,
-    planned_build_date: null, internal_notes: null, ...p,
+    planned_build_date: null, delivery_date: null, delivery_time: null,
+    internal_notes: null, ...p,
   };
 }
 

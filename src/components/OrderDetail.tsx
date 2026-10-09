@@ -10,6 +10,7 @@ import { NotesForm, PlannedDate } from '@/components/NotesForm';
 import { CustomerForm } from '@/components/CustomerForm';
 import { BestillingForm } from '@/components/BestillingForm';
 import { OrderAttachments } from '@/components/OrderAttachments';
+import { DeliverySchedule } from '@/components/DeliverySchedule';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -102,8 +103,18 @@ export function OrderDetail({
         />
       </Section>
 
+      {/* key: sidepanelet bytter ordre uten å remounte, og datofeltene har egen tilstand. */}
       <Section title="Planlagt byggedato">
-        <PlannedDate orderId={order.id} date={order.planned_build_date ?? ''} />
+        <PlannedDate key={order.id} orderId={order.id} date={order.planned_build_date ?? ''} />
+      </Section>
+
+      <Section title="Avtalt levering">
+        <DeliverySchedule
+          key={order.id}
+          orderId={order.id}
+          date={order.delivery_date}
+          time={order.delivery_time}
+        />
       </Section>
 
       {compact ? (

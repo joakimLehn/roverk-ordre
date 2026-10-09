@@ -80,6 +80,8 @@ describe('normalize', () => {
       created_at: new Date('2026-07-16T18:33:43.959Z'),
       preferred_date: new Date(2026, 7, 22),
       planned_build_date: null,
+      delivery_date: new Date(2026, 9, 14),
+      delivery_time: '10:30:00',
       invoiced_at: new Date('2026-08-10T00:00:00.000Z'),
       paid_at: null,
       name: 'Kari',
@@ -87,6 +89,8 @@ describe('normalize', () => {
     expect(o.created_at).toBe('2026-07-16T18:33:43.959Z');
     expect(o.preferred_date).toBe('2026-08-22');
     expect(o.planned_build_date).toBeNull();
+    expect(o.delivery_date).toBe('2026-10-14');
+    expect(o.delivery_time).toBe('10:30');
     expect(o.invoiced_at).toBe('2026-08-10T00:00:00.000Z');
     expect(o.paid_at).toBeNull();
     expect(o.name).toBe('Kari');

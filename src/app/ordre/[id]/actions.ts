@@ -14,6 +14,7 @@ import {
 } from '@/lib/db';
 import { deleteInspectionBlob } from '@/lib/inspection-blob';
 import { parseBestillingEdit } from '@/lib/edit-order';
+import { parseDelivery } from '@/lib/delivery';
 import {
   orderFileDisplayName,
   validateOrderFileInsert,
@@ -74,6 +75,22 @@ export async function setPlannedDate(id: string, date: string): Promise<void> {
   await requireUser();
   await updateOrderFields(id, { planned_build_date: ISO_DATE_RE.test(date) ? date : null });
   done(id);
+}
+
+export async function setDelivery(
+  id: string,
+  date: string,
+  time: string,
+): Promise<{ message?: string }> {
+  await requireUser();
+  const parsed = parseDelivery(date, time);
+  if (!parsed.ok) return { message: parsed.error };
+  await updateOrderFields(id, {
+    delivery_date: parsed.delivery_date,
+    delivery_time: parsed.delivery_time,
+  });
+  done(id);
+  return {};
 }
 
 export async function saveNotes(id: string, notes: string): Promise<void> {

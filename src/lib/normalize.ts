@@ -33,6 +33,8 @@ export function normalizeOrder(row: Record<string, unknown>): Order {
     paid_at: toIsoString(row.paid_at),
     preferred_date: toDateString(row.preferred_date),
     planned_build_date: toDateString(row.planned_build_date),
+    delivery_date: toDateString(row.delivery_date),
+    delivery_time: toTimeString(row.delivery_time),
   };
 }
 

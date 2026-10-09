@@ -18,5 +18,7 @@ export interface Order {
   paid_at: string | null;
   is_test: boolean;
   planned_build_date: string | null;
+  delivery_date: string | null;  // avtalt levering, YYYY-MM-DD
+  delivery_time: string | null;  // HH:MM, krever delivery_date
   internal_notes: string | null;
 }

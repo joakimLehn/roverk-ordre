@@ -24,8 +24,9 @@ separat til Vercel). Denne appen:
   aldri disse config-nøklene
 - leser `orders` og oppdaterer KUN kolonnene den selv har lagt til:
   `build_status`, `invoiced_at`, `paid_at`, `is_test`, `planned_build_date`,
-  `internal_notes` – pluss kundefeltene (`name`, `phone`, `email`, `address`,
-  `preferred_date`) ved eksplisitt redigering
+  `delivery_date`, `delivery_time`, `internal_notes` – pluss kundefeltene
+  (`name`, `phone`, `email`, `address`, `preferred_date`) ved eksplisitt
+  redigering
 - eier tabellene den selv oppretter: `allowed_emails`, `inspections`,
   `inspection_files` og `order_files`. Full CRUD der. Nettsidens kolonner
   røres ikke; FK mot `orders.id` på `order_files` er tillatt.

@@ -20,7 +20,7 @@ function sql() {
 
 const ORDER_COLS = `id, created_at, site, product, config, preferred_date, name, phone,
   email, address, address_meta, price_nok, build_status, invoiced_at, paid_at,
-  is_test, planned_build_date, internal_notes`;
+  is_test, planned_build_date, delivery_date, delivery_time, internal_notes`;
 
 export async function listOrders(limit = 300): Promise<Order[]> {
   const rows = (await sql().query(
@@ -41,7 +41,7 @@ export async function getOrder(id: string): Promise<Order | null> {
 // Kolonnenavn interpoleres kun fra denne typed whitelisten – aldri brukerinput.
 type EditableField =
   | 'build_status' | 'invoiced_at' | 'paid_at' | 'is_test'
-  | 'planned_build_date' | 'internal_notes'
+  | 'planned_build_date' | 'delivery_date' | 'delivery_time' | 'internal_notes'
   | 'name' | 'phone' | 'email' | 'address' | 'preferred_date';
 
 export async function updateOrderFields(
